@@ -1,0 +1,39 @@
+project.version = "$version"
+project.group = "$group"
+
+// apply from: "$publishGradlePath"
+
+kotlin {
+    jvm {
+        compilations.main {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation libs.kotlin
+                api libs.kotlin.serialization
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation libs.kotlin.test.common
+                implementation libs.kotlin.test.annotations.common
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation libs.kotlin.test.junit
+            }
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

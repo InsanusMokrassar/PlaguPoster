@@ -1,0 +1,24 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id "com.android.library"
+}
+
+apply from: "$mppProjectWithSerializationPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api libs.tgbotapi
+                api libs.microutils.repos.common
+            }
+        }
+        jvmMain {
+            dependencies {
+                api libs.microutils.repos.exposed
+                api libs.plagubot.plugin
+            }
+        }
+    }
+}

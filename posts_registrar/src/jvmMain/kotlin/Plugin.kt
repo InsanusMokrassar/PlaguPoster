@@ -8,6 +8,7 @@ import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.create
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plaguposter.common.FirstSourceIsCommandsFilter
 import dev.inmo.plaguposter.posts.models.NewPost
 import dev.inmo.plaguposter.posts.models.PostContentInfo
 import dev.inmo.plaguposter.posts.registrar.state.RegistrationState
@@ -142,7 +143,7 @@ object Plugin : Plugin {
         }
 
         onContentMessage(
-            initialFilter = { it.chat.id == config.sourceChatId && it.mediaGroupMessageOrNull() ?.mediaGroupId == null }
+            initialFilter = { it.chat.id == config.sourceChatId && it.mediaGroupMessageOrNull() ?.mediaGroupId == null && !FirstSourceIsCommandsFilter(it) }
         ) {
             startChain(RegistrationState.Finish(it.chat.id, listOf(PostContentInfo.fromMessage(it, 0))))
         }

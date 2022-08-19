@@ -1,8 +1,10 @@
 rootProject.name = 'plaguposter'
 
 String[] includes = [
+    ":common",
     ":posts",
-    ":posts_registrar"
+    ":posts_registrar",
+    ":runner"
 ]
 
 

@@ -31,6 +31,7 @@ android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", 
 
 tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }
 plagubot-plugin = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubot" }
+plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 kslog = { module = "dev.inmo:kslog", version.ref = "kslog" }

@@ -3,6 +3,7 @@ package dev.inmo.plaguposter.posts.exposed
 import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
+import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import kotlinx.serialization.json.Json
@@ -25,7 +26,7 @@ class ExposedPostsRepo(
         )
     }
 
-    override val primaryKey: PrimaryKey? = PrimaryKey(idColumn)
+    override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
     override val selectById: SqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
     override val selectByIds: SqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
@@ -41,6 +42,10 @@ class ExposedPostsRepo(
                 }
             )
         }
+
+    init {
+        initTable()
+    }
 
     override fun InsertStatement<Number>.asObject(value: NewPost): RegisteredPost {
         val id = PostId(get(idColumn))

@@ -10,9 +10,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api libs.tgbotapi
-                api libs.microutils.repos.common
-                api libs.kslog
+                api project(":plaguposter.common")
             }
         }
         jvmMain {

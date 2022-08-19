@@ -1,0 +1,22 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.plugin.serialization"
+    id 'application'
+}
+
+dependencies {
+    implementation libs.kotlin
+    api libs.plagubot.bot
+
+    api project(":plaguposter.posts")
+    api project(":plaguposter.posts_registrar")
+}
+
+application {
+    mainClassName = 'dev.inmo.plagubot.AppKt'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}

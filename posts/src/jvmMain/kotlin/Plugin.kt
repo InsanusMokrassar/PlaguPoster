@@ -15,7 +15,7 @@ import org.koin.core.module.Module
 
 object Plugin : Plugin {
     @Serializable
-    data class Config(
+    private data class Config(
         @SerialName("targetChat")
         val targetChatId: ChatId,
         @SerialName("cacheChat")

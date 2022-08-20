@@ -11,7 +11,7 @@ internal class ExposedContentInfoRepo(
     override val database: Database,
     postIdColumnReference: Column<String>
 ) : ExposedRepo, Table(name = "posts_content") {
-    val postIdColumn = (text("post_id") references postIdColumnReference).index()
+    val postIdColumn = text("post_id").references(postIdColumnReference, ReferenceOption.CASCADE, ReferenceOption.CASCADE)
     val chatIdColumn = long("chat_id")
     val messageIdColumn = long("message_id")
     val groupColumn = text("group").nullable()

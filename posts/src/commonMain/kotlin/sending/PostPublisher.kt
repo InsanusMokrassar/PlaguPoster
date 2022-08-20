@@ -2,6 +2,7 @@ package dev.inmo.plaguposter.posts.sending
 
 import dev.inmo.kslog.common.logger
 import dev.inmo.kslog.common.w
+import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.bot.TelegramBot
@@ -14,12 +15,13 @@ import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
 
 class PostPublisher(
     private val bot: TelegramBot,
-    private val repo: PostsRepo,
+    private val postsRepo: PostsRepo,
     private val cachingChatId: ChatId,
-    private val targetChatId: ChatId
+    private val targetChatId: ChatId,
+    private val deleteAfterPosting: Boolean = true
 ) {
     suspend fun publish(postId: PostId) {
-        val messagesInfo = repo.getById(postId) ?: let {
+        val messagesInfo = postsRepo.getById(postId) ?: let {
             logger.w { "Unable to get post with id $postId for publishing" }
             return
         }
@@ -54,6 +56,10 @@ class PostPublisher(
                     it.map { it.content.toMediaGroupMemberTelegramMedia() }
                 )
             }
+        }
+
+        if (deleteAfterPosting) {
+            postsRepo.deleteById(postId)
         }
 
     }

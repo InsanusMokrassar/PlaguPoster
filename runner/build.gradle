@@ -10,6 +10,7 @@ dependencies {
 
     api project(":plaguposter.posts")
     api project(":plaguposter.posts_registrar")
+    api project(":plaguposter.triggers.command")
 }
 
 application {

@@ -30,7 +30,7 @@ object Plugin : Plugin {
             return
         }
         single { get<Json>().decodeFromJsonElement(Config.serializer(), configJson) }
-        single<PostsRepo> { ExposedPostsRepo(database, get()) }
+        single<PostsRepo> { ExposedPostsRepo(database) }
         single {
             val config = get<Config>()
             PostPublisher(get(), get(), config.cacheChatId, config.targetChatId)

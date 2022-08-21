@@ -15,6 +15,7 @@ kotlin {
         }
         jvmMain {
             dependencies {
+                api libs.microutils.repos.cache
             }
         }
     }

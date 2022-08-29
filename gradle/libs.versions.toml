@@ -3,9 +3,9 @@
 kotlin = "1.7.10"
 kotlin-serialization = "1.4.0"
 
-plagubot = "2.1.1"
-tgbotapi = "3.1.1"
-microutils = "0.12.2"
+plagubot = "2.2.0"
+tgbotapi = "3.2.0"
+microutils = "0.12.4"
 kslog = "0.5.1"
 
 dexcount = "3.1.0"

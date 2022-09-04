@@ -41,7 +41,7 @@ class PostPublisher(
                 return@forEach
             }
             val resultContents = contents.mapNotNull {
-                it.order to (bot.forwardMessage(cachingChatId, it.chatId, it.messageId).contentMessageOrNull() ?: return@mapNotNull null)
+                it.order to (bot.forwardMessage(toChatId = cachingChatId, fromChatId = it.chatId, messageId = it.messageId).contentMessageOrNull() ?: return@mapNotNull null)
             }.sortedBy { it.first }.mapNotNull { (_, it) ->
                 it.withContentOrNull<MediaGroupContent>() ?: null.also { _ ->
                     bot.copyMessage(targetChatId, it)

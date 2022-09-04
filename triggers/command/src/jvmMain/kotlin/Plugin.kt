@@ -3,8 +3,10 @@ package dev.inmo.plaguposter.triggers.command
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.posts.sending.PostPublisher
+import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
@@ -15,6 +17,7 @@ import dev.inmo.tgbotapi.extensions.utils.botCommandTextSourceOrNull
 import dev.inmo.tgbotapi.extensions.utils.contentMessageOrNull
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.message.textsources.regular
 import kotlinx.coroutines.flow.filter
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -57,9 +60,10 @@ object Plugin : Plugin {
             }
 
             publisher.publish(postId)
-            reply(
+
+            edit(
                 it,
-                "Successfully triggered publishing"
+                it.content.textSources + regular(SuccessfulSymbol)
             )
         }
     }

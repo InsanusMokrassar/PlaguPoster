@@ -31,7 +31,8 @@ object Plugin : Plugin {
     @Serializable
     data class Config(
         val chats: ChatConfig,
-        val autoRemoveMessages: Boolean = true
+        val autoRemoveMessages: Boolean = true,
+        val deleteAfterPublishing: Boolean = true
     )
     override fun Module.setupDI(database: Database, params: JsonObject) {
         val configJson = params["posts"] ?: this@Plugin.let {
@@ -48,8 +49,8 @@ object Plugin : Plugin {
             WritePostsRepo::class,
         )
         single {
-            val config = get<ChatConfig>()
-            PostPublisher(get(), get(), config.cacheChatId, config.targetChatId)
+            val config = get<Config>()
+            PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.targetChatId, config.deleteAfterPublishing)
         }
     }
 

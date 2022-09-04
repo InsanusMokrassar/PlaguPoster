@@ -9,8 +9,7 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.create
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.FirstSourceIsCommandsFilter
-import dev.inmo.plaguposter.posts.models.NewPost
-import dev.inmo.plaguposter.posts.models.PostContentInfo
+import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.registrar.state.RegistrationState
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.extensions.api.delete
@@ -41,24 +40,8 @@ import org.koin.core.module.Module
 
 @Serializable
 object Plugin : Plugin {
-    @Serializable
-    private data class Config(
-        @SerialName("sourceChat")
-        val sourceChatId: ChatId
-    )
-
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        val configJson = params["registrar"] ?: this@Plugin.let {
-            it.logger.w {
-                "Unable to load posts plugin due to absence of `registrar` key in config"
-            }
-            return
-        }
-        single { get<Json>().decodeFromJsonElement(Config.serializer(), configJson) }
-    }
-
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
-        val config = koin.get<Config>()
+        val config = koin.get<ChatConfig>()
         val postsRepo = koin.get<PostsRepo>()
 
         strictlyOn {state: RegistrationState.InProcess ->

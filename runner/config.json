@@ -1,21 +1,28 @@
 {
   "database": {
-    "url": "jdbc:sqlite:file:test?mode=memory&cache=shared IT IS JUST EXAMPLE",
-    "driver": "org.sqlite.JDBC",
-    "username": "OPTIONAL username",
-    "password": "OPTIONAL password",
-    "initAutomatically": false
+    "url": "jdbc:postgresql://127.0.0.1:8091/test",
+    "username": "test",
+    "password": "test",
+    "driver": "org.postgresql.Driver"
   },
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "plugins": [
     "dev.inmo.plaguposter.posts.Plugin",
-    "dev.inmo.plaguposter.posts.registrar.Plugin"
+    "dev.inmo.plaguposter.posts.registrar.Plugin",
+    "dev.inmo.plaguposter.ratings.Plugin",
+    "dev.inmo.plaguposter.ratings.source.Plugin"
   ],
   "posts": {
     "targetChat": 12345678,
-    "cacheChat": 12345678
-  },
-  "registrar": {
+    "cacheChat": 12345678,
     "sourceChat": 12345678
+  },
+  "ratingsPolls": {
+    "variants": {
+      "Ok": 1,
+      "Not ok": -1
+    },
+    "autoAttach": true,
+    "ratingOfferText": "What do you think about it?"
   }
 }

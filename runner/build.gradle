@@ -12,6 +12,9 @@ dependencies {
     api project(":plaguposter.posts_registrar")
     api project(":plaguposter.triggers.command")
     api project(":plaguposter.ratings")
+    api project(":plaguposter.ratings.source")
+
+    api libs.psql
 }
 
 application {

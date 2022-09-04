@@ -1,0 +1,12 @@
+version: "3.4"
+
+services:
+  plaguposter_postgres:
+    image: postgres
+    container_name: "plaguposter_postgres"
+    environment:
+      POSTGRES_USER: "test"
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"
+    ports:
+      - "8091:5432"

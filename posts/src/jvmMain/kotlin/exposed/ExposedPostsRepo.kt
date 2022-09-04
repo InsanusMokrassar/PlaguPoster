@@ -8,6 +8,7 @@ import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.MessageIdentifier
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.InsertStatement
@@ -44,6 +45,9 @@ class ExposedPostsRepo(
                 }
             )
         }
+
+    private val _removedPostsFlow = MutableSharedFlow<RegisteredPost>()
+    override val removedPostsFlow: Flow<RegisteredPost> = _removedPostsFlow.asSharedFlow()
 
     init {
         initTable()
@@ -93,24 +97,29 @@ class ExposedPostsRepo(
 
     override suspend fun deleteById(ids: List<PostId>) {
         onBeforeDelete(ids)
+        val posts = ids.mapNotNull {
+            getById(it)
+        }.associateBy { it.id }
+        val existsIds = posts.keys.toList()
         transaction(db = database) {
             val deleted = deleteWhere(null, null) {
-                selectByIds(ids)
+                selectByIds(existsIds)
             }
             with(contentRepo) {
                 deleteWhere {
-                    postIdColumn.inList(ids.map { it.string })
+                    postIdColumn.inList(existsIds.map { it.string })
                 }
             }
-            if (deleted == ids.size) {
-                ids
+            if (deleted == existsIds.size) {
+                existsIds
             } else {
-                ids.filter {
+                existsIds.filter {
                     select { selectById(it) }.limit(1).none()
                 }
             }
         }.forEach {
             _deletedObjectsIdsFlow.emit(it)
+            _removedPostsFlow.emit(posts[it] ?: return@forEach)
         }
     }
 

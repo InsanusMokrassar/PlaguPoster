@@ -10,11 +10,10 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 
 class ExposedRatingsRepo(
-    database: Database,
-    postIdColumnReference: Column<String>
+    database: Database
 ) : RatingsRepo, KeyValueRepo<PostId, Rating> by ExposedKeyValueRepo(
     database,
-    { text("post_id") references postIdColumnReference },
+    { text("post_id") },
     { double("rating") },
     "ratings"
 ).withMapper(

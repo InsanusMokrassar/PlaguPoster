@@ -4,6 +4,8 @@ plugins {
     id 'application'
 }
 
+project.version = null
+
 dependencies {
     implementation libs.kotlin
     api libs.plagubot.bot

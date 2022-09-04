@@ -1,19 +1,17 @@
 package dev.inmo.plaguposter.posts.registrar
 
-import com.benasher44.uuid.uuid4
-import dev.inmo.kslog.common.logger
-import dev.inmo.kslog.common.w
-import dev.inmo.micro_utils.coroutines.firstOf
-import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
+import dev.inmo.micro_utils.coroutines.*
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.create
+import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.plagubot.Plugin
-import dev.inmo.plaguposter.common.FirstSourceIsCommandsFilter
+import dev.inmo.plaguposter.common.*
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.registrar.state.RegistrationState
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.*
@@ -30,6 +28,7 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import dev.inmo.tgbotapi.types.message.textsources.regular
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

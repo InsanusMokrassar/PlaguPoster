@@ -6,6 +6,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.posts.sending.PostPublisher
+import dev.inmo.plaguposter.ratings.selector.Selector
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
@@ -38,10 +39,7 @@ object Plugin : Plugin {
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val postsRepo = koin.get<PostsRepo>()
         val publisher = koin.get<PostPublisher>()
-        strictlyOn { state: PublishState ->
-
-            null
-        }
+        val selector = koin.getOrNull<Selector>()
 
         onCommand("publish_post") {
             val messageInReply = it.replyTo ?.contentMessageOrNull() ?: let { _ ->
@@ -49,7 +47,7 @@ object Plugin : Plugin {
 
                 return@onCommand
             }
-            val postId = postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId)
+            val postId = postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId) ?: selector ?.take(1) ?.firstOrNull()
             if (postId == null) {
                 reply(
                     it,

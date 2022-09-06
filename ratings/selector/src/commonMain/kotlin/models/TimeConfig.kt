@@ -17,8 +17,7 @@ class TimeConfig(
     @Transient
     val range = from .. to
 
-    val isActive: Boolean
-        get() = DateTime.now().time in range
+    fun isActive(now: Time): Boolean = now in range
 
 
     object TimeSerializer : KSerializer<Time> {

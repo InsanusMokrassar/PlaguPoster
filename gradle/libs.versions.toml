@@ -7,6 +7,7 @@ plagubot = "2.3.0"
 tgbotapi = "3.2.0"
 microutils = "0.12.6"
 kslog = "0.5.1"
+krontab = "0.8.0"
 
 psql = "42.3.6"
 
@@ -38,6 +39,7 @@ microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", versio
 microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
 kslog = { module = "dev.inmo:kslog", version.ref = "kslog" }
+krontab = { module = "dev.inmo:krontab", version.ref = "krontab" }
 
 psql = { module = "org.postgresql:postgresql", version.ref = "psql" }
 

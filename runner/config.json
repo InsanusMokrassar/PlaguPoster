@@ -10,7 +10,9 @@
     "dev.inmo.plaguposter.posts.Plugin",
     "dev.inmo.plaguposter.posts.registrar.Plugin",
     "dev.inmo.plaguposter.ratings.Plugin",
-    "dev.inmo.plaguposter.ratings.source.Plugin"
+    "dev.inmo.plaguposter.ratings.source.Plugin",
+    "dev.inmo.plaguposter.ratings.selector.Plugin",
+    "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin"
   ],
   "posts": {
     "targetChat": 12345678,
@@ -61,5 +63,8 @@
         }
       }
     ]
+  },
+  "timer_trigger": {
+    "krontab": "0 30 2/4 * *"
   }
 }

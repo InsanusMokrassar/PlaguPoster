@@ -8,6 +8,7 @@ String[] includes = [
     ":ratings:source",
     ":ratings:selector",
     ":triggers:command",
+    ":triggers:selector_with_timer",
 //    ":settings",
     ":runner"
 ]

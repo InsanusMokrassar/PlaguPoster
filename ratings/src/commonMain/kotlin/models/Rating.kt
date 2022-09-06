@@ -7,4 +7,6 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class Rating(
     val double: Double
-)
+) : Comparable<Rating> {
+    override fun compareTo(other: Rating): Int = double.compareTo(other.double)
+}

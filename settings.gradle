@@ -7,6 +7,7 @@ String[] includes = [
     ":ratings",
     ":ratings:source",
     ":ratings:selector",
+    ":ratings:gc",
     ":triggers:command",
     ":triggers:selector_with_timer",
 //    ":settings",

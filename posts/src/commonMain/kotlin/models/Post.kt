@@ -1,5 +1,7 @@
 package dev.inmo.plaguposter.posts.models
 
+import com.soywiz.klock.DateTime
+import dev.inmo.plaguposter.common.DateTimeSerializer
 import dev.inmo.tgbotapi.types.ChatId
 import kotlinx.serialization.Serializable
 
@@ -16,5 +18,7 @@ data class NewPost(
 @Serializable
 data class RegisteredPost(
     val id: PostId,
+    @Serializable(DateTimeSerializer::class)
+    val created: DateTime,
     override val content: List<PostContentInfo>
 ) : Post

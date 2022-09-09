@@ -4,8 +4,8 @@ kotlin = "1.7.10"
 kotlin-serialization = "1.4.0"
 
 plagubot = "2.3.0"
-tgbotapi = "3.2.0"
-microutils = "0.12.6"
+tgbotapi = "3.2.1"
+microutils = "0.12.11"
 kslog = "0.5.1"
 krontab = "0.8.0"
 

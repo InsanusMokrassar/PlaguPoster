@@ -1,6 +1,7 @@
 package dev.inmo.plaguposter.posts.exposed
 
 import com.benasher44.uuid.uuid4
+import com.soywiz.klock.DateTime
 import dev.inmo.micro_utils.repos.KeyValuesRepo
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
@@ -21,6 +22,9 @@ class ExposedPostsRepo(
     tableName = "posts"
 ) {
     val idColumn = text("id").clientDefault { uuid4().toString() }
+    val createdColumn = double("datetime").default(0.0).clientDefault {
+        DateTime.nowUnix()
+    }
 
     private val contentRepo by lazy {
         ExposedContentInfoRepo(
@@ -38,6 +42,7 @@ class ExposedPostsRepo(
             val id = PostId(get(idColumn))
             return RegisteredPost(
                 id,
+                DateTime(get(createdColumn)),
                 with(contentRepo) {
                     select { postIdColumn.eq(id.string) }.map {
                         it.asObject
@@ -70,6 +75,7 @@ class ExposedPostsRepo(
 
         return RegisteredPost(
             id,
+            DateTime(get(createdColumn)),
             with(contentRepo) {
                 select { postIdColumn.eq(id.string) }.map {
                     it.asObject
@@ -129,5 +135,9 @@ class ExposedPostsRepo(
                 select { chatIdColumn.eq(chatId.chatId).and(messageIdColumn.eq(messageId)) }.limit(1).firstOrNull() ?.get(postIdColumn)
             } ?.let(::PostId)
         }
+    }
+
+    override suspend fun getPostCreationTime(postId: PostId): DateTime? = transaction(database) {
+        select { selectById(postId) }.limit(1).firstOrNull() ?.get(createdColumn) ?.let(::DateTime)
     }
 }

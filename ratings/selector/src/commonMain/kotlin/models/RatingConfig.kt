@@ -17,7 +17,8 @@ import kotlin.random.Random
 data class RatingConfig(
     val min: Rating?,
     val max: Rating?,
-    val prefer: Prefer
+    val prefer: Prefer,
+    val otherwise: RatingConfig? = null
 ) {
     suspend fun select(repo: RatingsRepo, exclude: List<PostId>): PostId? {
         var reversed: Boolean = false
@@ -70,7 +71,7 @@ data class RatingConfig(
             Prefer.Max,
             Prefer.Min -> posts.firstOrNull()
             Prefer.Random -> posts.randomOrNull()
-        }
+        } ?: otherwise ?.select(repo, exclude)
     }
 
     @Serializable(Prefer.Serializer::class)

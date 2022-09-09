@@ -16,6 +16,7 @@ dependencies {
     api project(":plaguposter.ratings")
     api project(":plaguposter.ratings.source")
     api project(":plaguposter.ratings.selector")
+    api project(":plaguposter.ratings.gc")
 
     api libs.psql
 }

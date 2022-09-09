@@ -12,7 +12,8 @@
     "dev.inmo.plaguposter.ratings.Plugin",
     "dev.inmo.plaguposter.ratings.source.Plugin",
     "dev.inmo.plaguposter.ratings.selector.Plugin",
-    "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin"
+    "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
+    "dev.inmo.plaguposter.ratings.gc.Plugin"
   ],
   "posts": {
     "targetChat": 12345678,
@@ -66,5 +67,12 @@
   },
   "timer_trigger": {
     "krontab": "0 30 2/4 * *"
+  },
+  "gc": {
+    "autoclear": {
+      "rating": -2,
+      "autoClearKrontab": "0 0 0 * *",
+      "skipPostAge": 86400
+    }
   }
 }

@@ -6,8 +6,7 @@ import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
 import dev.inmo.krontab.utils.asFlow
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
-import dev.inmo.micro_utils.repos.deleteById
-import dev.inmo.micro_utils.repos.id
+import dev.inmo.micro_utils.repos.*
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -45,7 +44,9 @@ object Plugin : Plugin {
 
         config.immediateDrop ?.let { toDrop ->
             ratingsRepo.onNewValue.subscribeSafelyWithoutExceptions(this) {
-                postsRepo.deleteById(it.id)
+                if (it.value <= toDrop) {
+                    postsRepo.deleteById(it.id)
+                }
             }
         }
         config.autoclear ?.let { autoclear ->

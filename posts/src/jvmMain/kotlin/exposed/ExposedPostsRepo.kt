@@ -97,7 +97,9 @@ class ExposedPostsRepo(
         }
     }
 
-    override fun insert(value: NewPost, it: InsertStatement<Number>) {}
+    override fun insert(value: NewPost, it: InsertStatement<Number>) {
+        it[createdColumn] = DateTime.now().unixMillis
+    }
 
     override suspend fun deleteById(ids: List<PostId>) {
         onBeforeDelete(ids)

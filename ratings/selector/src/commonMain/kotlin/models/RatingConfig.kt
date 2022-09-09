@@ -21,9 +21,9 @@ import kotlinx.serialization.encoding.Encoder
 
 @Serializable
 data class RatingConfig(
-    val min: Rating?,
-    val max: Rating?,
-    val prefer: Prefer,
+    val min: Rating? = null,
+    val max: Rating? = null,
+    val prefer: Prefer = Prefer.Random,
     val otherwise: RatingConfig? = null,
     val postAge: Seconds? = null
 ) {

@@ -10,6 +10,7 @@ String[] includes = [
     ":ratings:gc",
     ":triggers:command",
     ":triggers:selector_with_timer",
+    ":inlines",
 //    ":settings",
     ":runner"
 ]

@@ -1,4 +1,4 @@
-package dev.inmo.plaguposter.posts.models
+package dev.inmo.plaguposter.common
 
 import dev.inmo.tgbotapi.types.ChatId
 import kotlinx.serialization.SerialName

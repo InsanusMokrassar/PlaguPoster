@@ -11,13 +11,11 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":plaguposter.common")
-                api project(":plaguposter.inlines")
+                api libs.tgbotapi.admins
             }
         }
         jvmMain {
             dependencies {
-                api libs.microutils.repos.exposed
-                api libs.plagubot.plugin
             }
         }
     }

@@ -10,7 +10,6 @@ import dev.inmo.micro_utils.repos.pagination.getAll
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.*
-import dev.inmo.plaguposter.posts.models.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -19,13 +18,10 @@ import dev.inmo.plaguposter.ratings.source.models.*
 import dev.inmo.plaguposter.ratings.source.repos.*
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
-import dev.inmo.tgbotapi.extensions.api.send.polls.sendRegularPoll
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.poll
-import dev.inmo.tgbotapi.extensions.utils.formatting.buildEntities
 import dev.inmo.tgbotapi.types.message.textsources.regular
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*

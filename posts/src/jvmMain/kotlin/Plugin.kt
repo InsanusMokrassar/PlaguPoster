@@ -9,7 +9,10 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.common.UnsuccessfulSymbol
 import dev.inmo.plaguposter.posts.exposed.ExposedPostsRepo
-import dev.inmo.plaguposter.posts.models.ChatConfig
+import dev.inmo.plaguposter.common.ChatConfig
+import dev.inmo.plaguposter.inlines.models.Format
+import dev.inmo.plaguposter.inlines.models.OfferTemplate
+import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.repo.*
 import dev.inmo.plaguposter.posts.sending.PostPublisher
 import dev.inmo.tgbotapi.extensions.api.delete
@@ -17,9 +20,7 @@ import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.message.textsources.regular
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
@@ -87,5 +88,14 @@ object Plugin : Plugin {
                 edit(it, it.content.textSources + regular(SuccessfulSymbol))
             }
         }
+
+        koin.getOrNull<InlineTemplatesRepo>() ?.addTemplate(
+            OfferTemplate(
+                "Delete post",
+                listOf(
+                    Format("/delete_post")
+                )
+            )
+        )
     }
 }

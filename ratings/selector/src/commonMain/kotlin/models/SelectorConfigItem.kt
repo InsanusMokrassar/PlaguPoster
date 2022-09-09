@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SelectorConfigItem(
     val time: TimeConfig,
-    val ratings: RatingConfig
+    val rating: RatingConfig
 )

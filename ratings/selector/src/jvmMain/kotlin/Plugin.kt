@@ -9,6 +9,6 @@ import org.koin.core.module.Module
 object Plugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {
         single { get<Json>().decodeFromJsonElement(SelectorConfig.serializer(), params["selector"] ?: return@single null) }
-        single<Selector> { DefaultSelector(get(), get()) }
+        single<Selector> { DefaultSelector(get(), get(), get()) }
     }
 }

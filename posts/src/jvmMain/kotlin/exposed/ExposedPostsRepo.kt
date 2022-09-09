@@ -22,9 +22,7 @@ class ExposedPostsRepo(
     tableName = "posts"
 ) {
     val idColumn = text("id").clientDefault { uuid4().toString() }
-    val createdColumn = double("datetime").default(0.0).clientDefault {
-        DateTime.nowUnix()
-    }
+    val createdColumn = double("datetime").default(0.0)
 
     private val contentRepo by lazy {
         ExposedContentInfoRepo(

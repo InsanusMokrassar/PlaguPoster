@@ -1,28 +1,41 @@
 package dev.inmo.plaguposter.ratings.selector.models
 
+import com.soywiz.klock.DateTime
+import com.soywiz.klock.seconds
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.Pagination
+import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging
+import dev.inmo.micro_utils.repos.pagination.getAll
+import dev.inmo.plaguposter.common.DateTimeSerializer
 import dev.inmo.plaguposter.posts.models.PostId
+import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
+import dev.inmo.tgbotapi.types.Seconds
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.random.Random
 
 @Serializable
 data class RatingConfig(
     val min: Rating?,
     val max: Rating?,
     val prefer: Prefer,
-    val otherwise: RatingConfig? = null
+    val otherwise: RatingConfig? = null,
+    val postAge: Seconds? = null
 ) {
-    suspend fun select(repo: RatingsRepo, exclude: List<PostId>): PostId? {
+    suspend fun select(
+        ratingsRepo: RatingsRepo,
+        postsRepo: PostsRepo,
+        exclude: List<PostId>,
+        now: DateTime
+    ): PostId? {
         var reversed: Boolean = false
         var count: Int? = null
+        val allowedCreationTime = now - (postAge ?: 0).seconds
 
         when (prefer) {
             Prefer.Max -> {
@@ -43,35 +56,32 @@ data class RatingConfig(
             null -> {
                 when (max) {
                     null -> {
-                        repo.keys(
-                            count ?.let { Pagination(0, it) } ?: FirstPagePagination(repo.count().toInt()),
-                            reversed
-                        ).results.filterNot {
-                            it in exclude
-                        }
+                        ratingsRepo.getAllByWithNextPaging { keys(it) }
                     }
                     else -> {
-                        repo.getPostsWithRatingLessEq(max, exclude = exclude).keys
+                        ratingsRepo.getPostsWithRatingLessEq(max, exclude = exclude).keys
                     }
                 }
             }
             else -> {
                 when (max) {
                     null -> {
-                        repo.getPostsWithRatingGreaterEq(min, exclude = exclude).keys
+                        ratingsRepo.getPostsWithRatingGreaterEq(min, exclude = exclude).keys
                     }
                     else -> {
-                        repo.getPosts(min .. max, reversed, count, exclude = exclude).keys
+                        ratingsRepo.getPosts(min .. max, reversed, count, exclude = exclude).keys
                     }
                 }
             }
+        }.filter {
+            it !in exclude && (postsRepo.getPostCreationTime(it) ?.let { it < allowedCreationTime } ?: true)
         }
 
         return when (prefer) {
             Prefer.Max,
             Prefer.Min -> posts.firstOrNull()
             Prefer.Random -> posts.randomOrNull()
-        } ?: otherwise ?.select(repo, exclude)
+        } ?: otherwise ?.select(ratingsRepo, postsRepo, exclude, now)
     }
 
     @Serializable(Prefer.Serializer::class)

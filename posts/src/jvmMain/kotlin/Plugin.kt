@@ -94,7 +94,8 @@ object Plugin : Plugin {
                 "Delete post",
                 listOf(
                     Format("/delete_post")
-                )
+                ),
+                "Should be used with a reply on any post message"
             )
         )
     }

@@ -5,6 +5,9 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.create
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.*
+import dev.inmo.plaguposter.inlines.models.Format
+import dev.inmo.plaguposter.inlines.models.OfferTemplate
+import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.registrar.state.RegistrationState
 import dev.inmo.plaguposter.posts.repo.PostsRepo
@@ -131,6 +134,14 @@ object Plugin : Plugin {
                             0
                         )
                     }
+                )
+            )
+        }
+        koin.getOrNull<InlineTemplatesRepo>() ?.apply {
+            addTemplate(
+                OfferTemplate(
+                    "Start post",
+                    listOf(Format("start_post"))
                 )
             )
         }

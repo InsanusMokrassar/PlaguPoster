@@ -10,6 +10,9 @@ import dev.inmo.micro_utils.repos.pagination.getAll
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.*
+import dev.inmo.plaguposter.inlines.models.Format
+import dev.inmo.plaguposter.inlines.models.OfferTemplate
+import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -188,6 +191,23 @@ object Plugin : Plugin {
                     )
                 }
             }
+        }
+
+        koin.getOrNull<InlineTemplatesRepo>() ?.apply {
+            addTemplate(
+                OfferTemplate(
+                    "Enable ratings for post",
+                    listOf(Format("attach_ratings")),
+                    "Require reply on post message"
+                )
+            )
+            addTemplate(
+                OfferTemplate(
+                    "Disable ratings for post",
+                    listOf(Format("detach_ratings")),
+                    "Require reply on post message"
+                )
+            )
         }
     }
 }

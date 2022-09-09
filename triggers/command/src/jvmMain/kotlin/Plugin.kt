@@ -4,6 +4,9 @@ import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.SuccessfulSymbol
+import dev.inmo.plaguposter.inlines.models.Format
+import dev.inmo.plaguposter.inlines.models.OfferTemplate
+import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.posts.sending.PostPublisher
 import dev.inmo.plaguposter.ratings.selector.Selector
@@ -62,6 +65,20 @@ object Plugin : Plugin {
             edit(
                 it,
                 it.content.textSources + regular(SuccessfulSymbol)
+            )
+        }
+
+        koin.getOrNull<InlineTemplatesRepo>() ?.apply {
+            addTemplate(
+                OfferTemplate(
+                    "Publish post",
+                    listOf(Format("publish_post")),
+                    if (selector == null) {
+                        "Require reply on post message"
+                    } else {
+                        "Publish post according to selector in system or post with message from reply"
+                    }
+                )
             )
         }
     }

@@ -109,7 +109,7 @@ data class RatingConfig(
         }
 
         companion object {
-            val values = arrayOf(Max, Min, Random)
+            val values: Array<Prefer> = arrayOf(Max, Min, Random)
         }
     }
 }

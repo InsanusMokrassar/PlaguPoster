@@ -45,12 +45,18 @@ object Plugin : Plugin {
         val selector = koin.getOrNull<Selector>()
 
         onCommand("publish_post") {
-            val messageInReply = it.replyTo ?.contentMessageOrNull() ?: let { _ ->
-                reply(it, "You should reply some message of post to trigger it for posting")
+            val messageInReply = it.replyTo ?.contentMessageOrNull() ?: run {
+                if (selector == null) {
+                    reply(it, "You should reply some message of post to trigger it for posting")
 
-                return@onCommand
+                    return@onCommand
+                } else {
+                    null
+                }
             }
-            val postId = postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId) ?: selector ?.take(1) ?.firstOrNull()
+            val postId = messageInReply ?.let {
+                postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId)
+            } ?: selector ?.take(1) ?.firstOrNull()
             if (postId == null) {
                 reply(
                     it,
@@ -72,7 +78,7 @@ object Plugin : Plugin {
             addTemplate(
                 OfferTemplate(
                     "Publish post",
-                    listOf(Format("publish_post")),
+                    listOf(Format("/publish_post")),
                     if (selector == null) {
                         "Require reply on post message"
                     } else {

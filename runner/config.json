@@ -14,8 +14,8 @@
     "dev.inmo.plaguposter.ratings.selector.Plugin",
     "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
     "dev.inmo.plaguposter.ratings.gc.Plugin",
-    "dev.inmo.tgbotapi.libraries.cache.admins.AdminsPlugin",
-    "dev.inmo.plaguposter.inlines.Plugin"
+    "dev.inmo.plaguposter.inlines.Plugin",
+    "dev.inmo.plaguposter.triggers.command.Plugin"
   ],
   "posts": {
     "targetChat": 12345678,

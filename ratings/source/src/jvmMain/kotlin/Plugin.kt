@@ -197,14 +197,14 @@ object Plugin : Plugin {
             addTemplate(
                 OfferTemplate(
                     "Enable ratings for post",
-                    listOf(Format("attach_ratings")),
+                    listOf(Format("/attach_ratings")),
                     "Require reply on post message"
                 )
             )
             addTemplate(
                 OfferTemplate(
                     "Disable ratings for post",
-                    listOf(Format("detach_ratings")),
+                    listOf(Format("/detach_ratings")),
                     "Require reply on post message"
                 )
             )

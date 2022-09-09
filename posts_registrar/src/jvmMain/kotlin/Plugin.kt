@@ -141,7 +141,7 @@ object Plugin : Plugin {
             addTemplate(
                 OfferTemplate(
                     "Start post",
-                    listOf(Format("start_post"))
+                    listOf(Format("/start_post"))
                 )
             )
         }

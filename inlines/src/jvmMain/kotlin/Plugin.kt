@@ -4,14 +4,16 @@ import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.ChatConfig
+import dev.inmo.plaguposter.inlines.models.Format
 import dev.inmo.plaguposter.inlines.models.OfferTemplate
 import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.tgbotapi.bot.exceptions.RequestException
 import dev.inmo.tgbotapi.extensions.api.answers.answerInlineQuery
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onBaseInlineQuery
-import dev.inmo.tgbotapi.libraries.cache.admins.AdminsCacheAPI
-import dev.inmo.tgbotapi.libraries.cache.admins.adminsPlugin
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.types.inlineQueryAnswerResultsLimit
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -30,15 +32,10 @@ object Plugin : Plugin {
     }
 
     override suspend fun BehaviourContext.setupBotPlugin(koin: Koin) {
-        val adminsApi = koin.get<AdminsCacheAPI>()
-        val chatConfig = koin.get<ChatConfig>()
         val templatesRepo = koin.get<InlineTemplatesRepo>()
         onBaseInlineQuery { query ->
-            if (!adminsApi.isAdmin(chatConfig.sourceChatId, query.from.id)) {
-                answerInlineQuery(query, cachedTime = 0)
-                return@onBaseInlineQuery
-            }
             val page = query.offset.toIntOrNull() ?: 0
+            val queryString = query.query.trim()
             try {
                 answerInlineQuery(
                     query,
@@ -50,7 +47,7 @@ object Plugin : Plugin {
                     ).results.mapIndexedNotNull { index, offerTemplate ->
                         offerTemplate.createArticleResult(
                             index.toString(),
-                            query.query
+                            queryString
                         )
                     },
                     nextOffset = (page + 1).toString(),
@@ -62,6 +59,23 @@ object Plugin : Plugin {
                     cachedTime = 0
                 )
             }
+        }
+        onCommand("help", requireOnlyCommandInMessage = true) {
+            reply(
+                it,
+                "Push the button above to see available commands",
+                replyMarkup = flatInlineKeyboard {
+                    inlineQueryInCurrentChatButton("Toggle commands", "")
+                }
+            )
+        }
+        koin.getOrNull<InlineTemplatesRepo>() ?.apply {
+            addTemplate(
+                OfferTemplate(
+                    "Trigger help button",
+                    listOf(Format("/help"))
+                )
+            )
         }
     }
 }

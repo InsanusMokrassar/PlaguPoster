@@ -1,0 +1,23 @@
+version: "3.4"
+
+services:
+  plaguposter_postgres:
+    image: postgres
+    container_name: "plaguposter_postgres"
+    restart: "unless-stopped"
+    environment:
+      POSTGRES_USER: "${PG_USER}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD}"
+      POSTGRES_DB: "${PG_DB}"
+    volumes:
+      - "${DATA_PATH}/db/:/var/lib/postgresql/"
+  plaguposter:
+    image: insanusmokrassar/plaguposter
+    container_name: "plaguposter"
+    restart: "unless-stopped"
+    volumes:
+      - "${DATA_PATH}/config.json:/config.json"
+    links:
+      - "plaguposter_postgres:postgres"
+    depends_on:
+      - "plaguposter_postgres"

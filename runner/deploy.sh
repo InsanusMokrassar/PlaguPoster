@@ -15,10 +15,9 @@ function assert_success() {
 
 app=plaguposter
 version=0.0.1
-server=docker.inmo.dev
+server=docker.io/insanusmokrassar
 
 assert_success ../gradlew build
-# scp ./build/distributions/AutoPostTestTelegramBot-1.0.0.zip ./config.json developer@insanusmokrassar.dev:/tmp/
 assert_success sudo docker build -t $app:"$version" .
 assert_success sudo docker tag $app:"$version" $server/$app:$version
 assert_success sudo docker tag $app:"$version" $server/$app:latest

@@ -13,19 +13,24 @@
     "dev.inmo.plaguposter.ratings.source.Plugin",
     "dev.inmo.plaguposter.ratings.selector.Plugin",
     "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
-    "dev.inmo.plaguposter.ratings.gc.Plugin",
     "dev.inmo.plaguposter.inlines.Plugin",
-    "dev.inmo.plaguposter.triggers.command.Plugin"
+    "dev.inmo.plaguposter.triggers.command.Plugin",
+    "dev.inmo.plaguposter.posts.panel.Plugin"
   ],
   "posts": {
-    "targetChat": 12345678,
-    "cacheChat": 12345678,
-    "sourceChat": 12345678
+    "chats": {
+      "targetChat": 12345678,
+      "cacheChat": 12345678,
+      "sourceChat": 12345678
+    }
   },
   "ratingsPolls": {
     "variants": {
-      "Ok": 1,
-      "Not ok": -1
+      "Круть": 2,
+      "Ок": 1,
+      "Не ок": -1,
+      "Совсем не ок": -2,
+      "Посмотреть результаты": 0
     },
     "autoAttach": true,
     "ratingOfferText": "What do you think about it?"
@@ -35,33 +40,18 @@
       {
         "time": {
           "from": "00:00",
-          "to": "00:00"
+          "to": "23:59"
         },
         "rating": {
-          "min": 0.0,
-          "max": 1.0,
-          "prefer": "random"
+          "prefer": "max"
         }
       },
       {
         "time": {
-          "from": "00:00",
+          "from": "23:59",
           "to": "00:00"
         },
         "rating": {
-          "min": 0.0,
-          "max": 1.0,
-          "prefer": "min"
-        }
-      },
-      {
-        "time": {
-          "from": "00:00",
-          "to": "00:00"
-        },
-        "rating": {
-          "min": 0.0,
-          "max": 1.0,
           "prefer": "max"
         }
       }
@@ -70,11 +60,13 @@
   "timer_trigger": {
     "krontab": "0 30 2/4 * *"
   },
-  "gc": {
-    "autoclear": {
-      "rating": -2,
-      "autoClearKrontab": "0 0 0 * *",
-      "skipPostAge": 86400
-    }
+  "panel": {
+    "textPrefix": "Post management:",
+    "buttonsPerRow": 2,
+    "parseMode": "MarkdownV2",
+    "deleteButtonText": "Delete"
+  },
+  "publish_command": {
+    "panelButtonText": "Publish"
   }
 }

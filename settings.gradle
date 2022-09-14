@@ -3,6 +3,7 @@ rootProject.name = 'plaguposter'
 String[] includes = [
     ":common",
     ":posts",
+    ":posts:panel",
     ":posts_registrar",
     ":ratings",
     ":ratings:source",

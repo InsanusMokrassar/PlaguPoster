@@ -1,5 +1,6 @@
 package dev.inmo.plaguposter.ratings.source
 
+import com.benasher44.uuid.uuid4
 import dev.inmo.kslog.common.e
 import dev.inmo.kslog.common.logger
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
@@ -14,18 +15,28 @@ import dev.inmo.plaguposter.inlines.models.Format
 import dev.inmo.plaguposter.inlines.models.OfferTemplate
 import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.models.PostId
+import dev.inmo.plaguposter.posts.panel.PanelButtonBuilder
+import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
 import dev.inmo.plaguposter.ratings.source.models.*
 import dev.inmo.plaguposter.ratings.source.repos.*
+import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
+import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
@@ -41,7 +52,8 @@ object Plugin : Plugin {
         @Serializable(RatingsVariantsSerializer::class)
         val variants: RatingsVariants,
         val autoAttach: Boolean,
-        val ratingOfferText: String
+        val ratingOfferText: String,
+        val panelButtonText: String = "Ratings"
     )
 
     override fun Module.setupDI(database: Database, params: JsonObject) {
@@ -66,6 +78,7 @@ object Plugin : Plugin {
         val ratingsRepo = koin.get<RatingsRepo>()
         val postsRepo = koin.get<PostsRepo>()
         val config = koin.get<Config>()
+        val panelApi = koin.getOrNull<PanelButtonsAPI>()
 
         onPollUpdates (markerFactory = { it.id }) { poll ->
             val postId = pollsToPostsIdsRepo.get(poll.id) ?: return@onPollUpdates
@@ -92,6 +105,7 @@ object Plugin : Plugin {
                     pollsToPostsIdsRepo.set(sent.content.poll.id, postId)
                     pollsToMessageInfoRepo.set(sent.content.poll.id, sent.short())
                 }.getOrNull() ?: continue
+                panelApi ?.forceRefresh(postId)
                 return true
             }
             return false
@@ -105,6 +119,8 @@ object Plugin : Plugin {
                     delete(messageInfo.chatId, messageInfo.messageId)
                 }.onFailure {
                     this@Plugin.logger.e(it) { "Something went wrong when trying to remove ratings message ($messageInfo) for post $postId" }
+                }.onSuccess {
+                    panelApi ?.forceRefresh(postId)
                 }.isSuccess
             }.any().also {
                 if (it) {
@@ -208,6 +224,56 @@ object Plugin : Plugin {
                     "Require reply on post message"
                 )
             )
+        }
+
+        panelApi ?.apply {
+            add(
+                PanelButtonBuilder {
+                    CallbackDataInlineKeyboardButton(
+                        config.panelButtonText + if (pollsToPostsIdsRepo.keys(it.id, firstPageWithOneElementPagination).results.any()) {
+                            SuccessfulSymbol
+                        } else {
+                            UnsuccessfulSymbol
+                        },
+                        "toggle_ratings ${it.id.string}"
+                    )
+                }
+            )
+            onMessageDataCallbackQuery(
+                initialFilter = {
+                    it.data.startsWith("toggle_ratings ")
+                }
+            ) {
+                val postId = it.data.removePrefix("toggle_ratings ").let(::PostId)
+                val post = postsRepo.getById(postId) ?: return@onMessageDataCallbackQuery
+
+                val ratingPollAttached = pollsToPostsIdsRepo.keys(postId, firstPageWithOneElementPagination).results.any()
+                val toggleData = uuid4().toString()
+
+                val editedMessage = edit(
+                    it.message,
+                    replyMarkup = flatInlineKeyboard {
+                        dataButton(
+                            if (ratingPollAttached) {
+                                UnsuccessfulSymbol
+                            } else {
+                                SuccessfulSymbol
+                            },
+                            toggleData
+                        )
+                        panelApi.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
+                    }
+                )
+
+                val pushedButton = waitMessageDataCallbackQuery().first { it.message.sameMessage(editedMessage) }
+                if (pushedButton.data == toggleData) {
+                    if (pollsToPostsIdsRepo.keys(postId, firstPageWithOneElementPagination).results.any()) {
+                        detachPoll(postId)
+                    } else {
+                        attachPoll(postId)
+                    }
+                }
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ kotlin {
                 api project(":plaguposter.common")
                 api project(":plaguposter.posts")
                 api project(":plaguposter.ratings.selector")
+                api project(":plaguposter.posts.panel")
             }
         }
         jvmMain {

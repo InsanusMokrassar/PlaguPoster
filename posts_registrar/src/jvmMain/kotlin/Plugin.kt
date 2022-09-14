@@ -103,11 +103,6 @@ object Plugin : Plugin {
                 NewPost(
                     state.messages
                 )
-            ).firstOrNull() ?.let {
-                send(state.context, "Ok, you have registered ${it.content.size} messages as new post")
-            } ?: send(
-                state.context,
-                "Sorry, for some reason I was unable to register your post"
             )
             null
         }

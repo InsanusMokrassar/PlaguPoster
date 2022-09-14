@@ -5,9 +5,9 @@ kotlin-serialization = "1.4.0"
 
 plagubot = "2.3.1"
 tgbotapi = "3.2.1"
-microutils = "0.12.11"
-kslog = "0.5.1"
-krontab = "0.8.0"
+microutils = "0.12.13"
+kslog = "0.5.2"
+krontab = "0.8.1"
 tgbotapi-libraries = "0.5.3"
 
 psql = "42.3.6"
@@ -39,6 +39,7 @@ plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }
+microutils-koin = { module = "dev.inmo:micro_utils.koin", version.ref = "microutils" }
 kslog = { module = "dev.inmo:kslog", version.ref = "kslog" }
 krontab = { module = "dev.inmo:krontab", version.ref = "krontab" }
 

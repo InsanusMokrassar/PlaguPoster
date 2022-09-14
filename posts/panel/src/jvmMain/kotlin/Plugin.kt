@@ -20,11 +20,13 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.withContentOrNull
+import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.MessageIdentifier
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.message.ParseMode
+import dev.inmo.tgbotapi.types.message.abstracts.Message
 import dev.inmo.tgbotapi.types.message.content.TextContent
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -68,12 +70,12 @@ object Plugin : Plugin {
         val postsRepo = koin.get<PostsRepo>()
         val chatsConfig = koin.get<ChatConfig>()
         val config = koin.getOrNull<Config>() ?: Config()
-        val keeper = koin.get<PanelButtonsAPI>()
+        val api = koin.get<PanelButtonsAPI>()
         val postsMessages = PostsMessages(koin.get(), koin.get())
 
         postsRepo.newObjectsFlow.subscribeSafelyWithoutExceptions(this) {
             val firstContent = it.content.first()
-            val buttons = keeper.buttonsBuilders.chunked(config.buttonsPerRow).mapNotNull { row ->
+            val buttons = api.buttonsBuilders.chunked(config.buttonsPerRow).mapNotNull { row ->
                 row.mapNotNull { builder ->
                     builder.buildButton(it)
                 }.takeIf { it.isNotEmpty() }
@@ -95,22 +97,31 @@ object Plugin : Plugin {
             delete(chatId, messageId)
         }
 
+        suspend fun updatePost(
+            postId: PostId,
+            chatId: ChatId,
+            messageId: MessageIdentifier
+        ) {
+            val post = postsRepo.getById(postId) ?: return
+            val buttons = api.buttonsBuilders.chunked(config.buttonsPerRow).mapNotNull { row ->
+                row.mapNotNull { builder ->
+                    builder.buildButton(post)
+                }.takeIf { it.isNotEmpty() }
+            }
+            edit(
+                chatId,
+                messageId,
+                replyMarkup = InlineKeyboardMarkup(buttons)
+            )
+        }
+
         onMessageDataCallbackQuery (
             initialFilter = {
                 it.data.startsWith(PanelButtonsAPI.openGlobalMenuDataPrefix) && it.message.chat.id == chatsConfig.sourceChatId
             }
         ) {
             val postId = it.data.removePrefix(PanelButtonsAPI.openGlobalMenuDataPrefix).let(::PostId)
-            val post = postsRepo.getById(postId) ?: return@onMessageDataCallbackQuery
-            val buttons = keeper.buttonsBuilders.chunked(config.buttonsPerRow).mapNotNull { row ->
-                row.mapNotNull { builder ->
-                    builder.buildButton(post)
-                }.takeIf { it.isNotEmpty() }
-            }
-            edit(
-                it.message.withContentOrNull<TextContent>() ?: return@onMessageDataCallbackQuery,
-                replyMarkup = InlineKeyboardMarkup(buttons)
-            )
+            updatePost(postId, it.message.chat.id, it.message.messageId)
         }
         onMessageDataCallbackQuery(
             initialFilter = {
@@ -126,7 +137,7 @@ object Plugin : Plugin {
                 query.message,
                 replyMarkup = flatInlineKeyboard {
                     dataButton("\uD83D\uDDD1", approveData)
-                    keeper.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
+                    api.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
                 }
             )
 
@@ -137,6 +148,11 @@ object Plugin : Plugin {
             if (pushedButton.data == approveData) {
                 postsRepo.deleteById(postId)
             }
+        }
+
+        api.forceRefreshFlow.subscribeSafelyWithoutExceptions(this) {
+            val (chatId, messageId) = postsMessages.get(it) ?: return@subscribeSafelyWithoutExceptions
+            updatePost(it, chatId, messageId)
         }
     }
 }

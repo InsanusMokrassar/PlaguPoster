@@ -1,5 +1,6 @@
 package dev.inmo.plaguposter.ratings.source
 
+import com.benasher44.uuid.uuid4
 import dev.inmo.kslog.common.e
 import dev.inmo.kslog.common.logger
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
@@ -27,9 +28,15 @@ import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
@@ -219,7 +226,7 @@ object Plugin : Plugin {
             )
         }
 
-        koin.getOrNull<PanelButtonsAPI>() ?.apply {
+        panelApi ?.apply {
             add(
                 PanelButtonBuilder {
                     CallbackDataInlineKeyboardButton(
@@ -238,14 +245,34 @@ object Plugin : Plugin {
                 }
             ) {
                 val postId = it.data.removePrefix("toggle_ratings ").let(::PostId)
+                val post = postsRepo.getById(postId) ?: return@onMessageDataCallbackQuery
 
-                if (pollsToPostsIdsRepo.keys(postId, firstPageWithOneElementPagination).results.any()) {
-                    detachPoll(postId)
-                } else {
-                    attachPoll(postId)
+                val ratingPollAttached = pollsToPostsIdsRepo.keys(postId, firstPageWithOneElementPagination).results.any()
+                val toggleData = uuid4().toString()
+
+                val editedMessage = edit(
+                    it.message,
+                    replyMarkup = flatInlineKeyboard {
+                        dataButton(
+                            if (ratingPollAttached) {
+                                UnsuccessfulSymbol
+                            } else {
+                                SuccessfulSymbol
+                            },
+                            toggleData
+                        )
+                        panelApi.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
+                    }
+                )
+
+                val pushedButton = waitMessageDataCallbackQuery().first { it.message.sameMessage(editedMessage) }
+                if (pushedButton.data == toggleData) {
+                    if (pollsToPostsIdsRepo.keys(postId, firstPageWithOneElementPagination).results.any()) {
+                        detachPoll(postId)
+                    } else {
+                        attachPoll(postId)
+                    }
                 }
-
-                answer(it)
             }
         }
     }

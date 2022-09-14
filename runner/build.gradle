@@ -11,6 +11,7 @@ dependencies {
     api libs.plagubot.bot
 
     api project(":plaguposter.posts")
+    api project(":plaguposter.posts.panel")
     api project(":plaguposter.posts_registrar")
     api project(":plaguposter.triggers.command")
     api project(":plaguposter.triggers.selector_with_timer")

@@ -12,10 +12,7 @@ kotlin {
             dependencies {
                 api project(":plaguposter.common")
                 api project(":plaguposter.posts")
-            }
-        }
-        jvmMain {
-            dependencies {
+                api libs.microutils.koin
             }
         }
     }

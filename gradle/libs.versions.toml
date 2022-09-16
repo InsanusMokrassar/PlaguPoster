@@ -3,14 +3,14 @@
 kotlin = "1.7.10"
 kotlin-serialization = "1.4.0"
 
-plagubot = "2.3.1"
-tgbotapi = "3.2.1"
+plagubot = "2.3.2"
+tgbotapi = "3.2.3"
 microutils = "0.12.13"
 kslog = "0.5.2"
 krontab = "0.8.1"
 tgbotapi-libraries = "0.5.3"
 
-psql = "42.3.6"
+psql = "42.5.0"
 
 dexcount = "3.1.0"
 junit_version = "4.12"

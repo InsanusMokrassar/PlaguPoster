@@ -41,7 +41,7 @@ object Plugin : Plugin {
         val buttonsPerRow: Int = 4,
         val deleteButtonText: String? = null,
         val rootButtonText: String = "\uD83D\uDD19",
-        val refreshButtonText: String = "\uD83D\uDD04"
+        val refreshButtonText: String? = "\uD83D\uDD04"
     )
     override fun Module.setupDI(database: Database, params: JsonObject) {
         params["panel"] ?.let { element ->
@@ -58,7 +58,7 @@ object Plugin : Plugin {
                         )
                     }
                 },
-                config.refreshButtonText.let { text ->
+                config.refreshButtonText ?.let { text ->
                     PanelButtonBuilder {
                         CallbackDataInlineKeyboardButton(
                             text,

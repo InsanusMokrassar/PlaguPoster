@@ -10,8 +10,10 @@ import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.panel.repos.PostsMessages
 import dev.inmo.plaguposter.posts.repo.PostsRepo
+import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
@@ -19,14 +21,11 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessag
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
-import dev.inmo.tgbotapi.extensions.utils.withContentOrNull
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.MessageIdentifier
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.message.ParseMode
-import dev.inmo.tgbotapi.types.message.abstracts.Message
-import dev.inmo.tgbotapi.types.message.content.TextContent
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -41,7 +40,8 @@ object Plugin : Plugin {
         val parseMode: ParseMode? = null,
         val buttonsPerRow: Int = 4,
         val deleteButtonText: String? = null,
-        val rootButtonText: String = "Return to panel"
+        val rootButtonText: String = "\uD83D\uDD19",
+        val refreshButtonText: String = "\uD83D\uDD04"
     )
     override fun Module.setupDI(database: Database, params: JsonObject) {
         params["panel"] ?.let { element ->
@@ -55,6 +55,14 @@ object Plugin : Plugin {
                         CallbackDataInlineKeyboardButton(
                             text,
                             "delete ${it.id.string}"
+                        )
+                    }
+                },
+                config.refreshButtonText.let { text ->
+                    PanelButtonBuilder {
+                        CallbackDataInlineKeyboardButton(
+                            text,
+                            "refresh ${it.id.string}"
                         )
                     }
                 }
@@ -97,7 +105,7 @@ object Plugin : Plugin {
             delete(chatId, messageId)
         }
 
-        suspend fun updatePost(
+        suspend fun refreshPostMessage(
             postId: PostId,
             chatId: ChatId,
             messageId: MessageIdentifier
@@ -108,9 +116,10 @@ object Plugin : Plugin {
                     builder.buildButton(post)
                 }.takeIf { it.isNotEmpty() }
             }
-            edit(
+            editMessageText(
                 chatId,
                 messageId,
+                text = config.text,
                 replyMarkup = InlineKeyboardMarkup(buttons)
             )
         }
@@ -121,7 +130,7 @@ object Plugin : Plugin {
             }
         ) {
             val postId = it.data.removePrefix(PanelButtonsAPI.openGlobalMenuDataPrefix).let(::PostId)
-            updatePost(postId, it.message.chat.id, it.message.messageId)
+            refreshPostMessage(postId, it.message.chat.id, it.message.messageId)
         }
         onMessageDataCallbackQuery(
             initialFilter = {
@@ -140,6 +149,7 @@ object Plugin : Plugin {
                     api.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
                 }
             )
+            answer(query)
 
             val pushedButton = waitMessageDataCallbackQuery().first {
                 it.message.sameMessage(query.message)
@@ -149,10 +159,25 @@ object Plugin : Plugin {
                 postsRepo.deleteById(postId)
             }
         }
+        onMessageDataCallbackQuery(
+            initialFilter = {
+                it.data.startsWith("refresh ") && it.message.chat.id == chatsConfig.sourceChatId
+            }
+        ) { query ->
+            val postId = query.data.removePrefix("refresh ").let(::PostId)
+            val (chatId, messageId) = postsMessages.get(postId) ?: return@onMessageDataCallbackQuery
+
+            refreshPostMessage(
+                postId,
+                chatId,
+                messageId
+            )
+            answer(query)
+        }
 
         api.forceRefreshFlow.subscribeSafelyWithoutExceptions(this) {
             val (chatId, messageId) = postsMessages.get(it) ?: return@subscribeSafelyWithoutExceptions
-            updatePost(it, chatId, messageId)
+            refreshPostMessage(it, chatId, messageId)
         }
     }
 }

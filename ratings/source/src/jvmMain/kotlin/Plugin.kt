@@ -273,6 +273,7 @@ object Plugin : Plugin {
                         attachPoll(postId)
                     }
                 }
+                answer(it)
             }
         }
     }

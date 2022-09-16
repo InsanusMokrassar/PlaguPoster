@@ -41,7 +41,7 @@ object Plugin : Plugin {
         val parseMode: ParseMode? = null,
         val buttonsPerRow: Int = 4,
         val deleteButtonText: String? = null,
-        val rootButtonText: String = "\uD83D\uDD19",
+        val rootButtonText: String = "◀️",
         val refreshButtonText: String? = "\uD83D\uDD04"
     )
     override fun Module.setupDI(database: Database, params: JsonObject) {

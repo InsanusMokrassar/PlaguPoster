@@ -131,6 +131,7 @@ object Plugin : Plugin {
         ) {
             val postId = it.data.removePrefix(PanelButtonsAPI.openGlobalMenuDataPrefix).let(::PostId)
             refreshPostMessage(postId, it.message.chat.id, it.message.messageId)
+            answer(it)
         }
         onMessageDataCallbackQuery(
             initialFilter = {

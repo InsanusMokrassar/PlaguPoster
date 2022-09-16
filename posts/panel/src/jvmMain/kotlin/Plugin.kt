@@ -1,6 +1,7 @@
 package dev.inmo.plaguposter.posts.panel
 
 import com.benasher44.uuid.uuid4
+import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.repos.deleteById
@@ -168,11 +169,13 @@ object Plugin : Plugin {
             val postId = query.data.removePrefix("refresh ").let(::PostId)
             val (chatId, messageId) = postsMessages.get(postId) ?: return@onMessageDataCallbackQuery
 
-            refreshPostMessage(
-                postId,
-                chatId,
-                messageId
-            )
+            runCatchingSafely {
+                refreshPostMessage(
+                    postId,
+                    chatId,
+                    messageId
+                )
+            }
             answer(query)
         }
 

@@ -22,6 +22,7 @@ import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
 import dev.inmo.plaguposter.ratings.source.models.*
 import dev.inmo.plaguposter.ratings.source.repos.*
+import dev.inmo.plaguposter.ratings.utils.postsByRatings
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
@@ -34,8 +35,9 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
+import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
-import kotlinx.coroutines.flow.filter
+import dev.inmo.tgbotapi.utils.buildEntities
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -79,6 +81,7 @@ object Plugin : Plugin {
         val postsRepo = koin.get<PostsRepo>()
         val config = koin.get<Config>()
         val panelApi = koin.getOrNull<PanelButtonsAPI>()
+        val chatConfig = koin.get<ChatConfig>()
 
         onPollUpdates (markerFactory = { it.id }) { poll ->
             val postId = pollsToPostsIdsRepo.get(poll.id) ?: return@onPollUpdates
@@ -205,6 +208,22 @@ object Plugin : Plugin {
                         it,
                         it.content.textSources + regular(" $UnsuccessfulSymbol")
                     )
+                }
+            }
+        }
+        onCommand("ratings", requireOnlyCommandInMessage = true) {
+            if (it.chat.id == chatConfig.sourceChatId) {
+                val ratings = ratingsRepo.postsByRatings().toList().sortedByDescending { it.first }
+                val textSources = buildEntities {
+                    + "Ratings amount: " + bold("${ratings.sumOf { it.second.size }}") + "\n\n"
+                    ratings.forEach {
+                        + "• " + bold("% 3.1f".format(it.first.double)) + ": " + bold(it.second.size.toString()) + "\n"
+                    }
+                }
+                runCatchingSafely {
+                    edit(it, textSources)
+                }.onFailure { _ ->
+                    reply(it, textSources)
                 }
             }
         }

@@ -3,12 +3,12 @@
 kotlin = "1.7.10"
 kotlin-serialization = "1.4.0"
 
-plagubot = "2.3.2"
-tgbotapi = "3.2.3"
-microutils = "0.12.13"
+plagubot = "2.3.4"
+tgbotapi = "3.2.7"
+microutils = "0.12.16"
 kslog = "0.5.2"
 krontab = "0.8.1"
-tgbotapi-libraries = "0.5.3"
+tgbotapi-libraries = "0.5.5"
 
 psql = "42.5.0"
 
@@ -19,8 +19,8 @@ espresso_core = "3.4.0"
 
 android-gradle-plugin = "7.2.2"
 android-minSdk = "21"
-android-compileSdk = "32"
-android-buildTools = "32.0.0"
+android-compileSdk = "33"
+android-buildTools = "33.0.0"
 
 [libraries]
 

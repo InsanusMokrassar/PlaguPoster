@@ -18,6 +18,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
+import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.buildEntities
 import dev.inmo.tgbotapi.extensions.utils.formatting.regular
@@ -80,6 +81,12 @@ object Plugin : Plugin {
                     }.first()
                     emptyList<ContentMessage<MessageContent>>()
                 }
+                add {
+                    val finishPressed = waitCommandMessage("finish_post").filter {
+                        it.sameChat(messageToDelete)
+                    }.first()
+                    emptyList<ContentMessage<MessageContent>>()
+                }
             }.ifEmpty {
                 edit(messageToDelete, "Ok, finishing your request")
                 return@strictlyOn RegistrationState.Finish(
@@ -135,8 +142,16 @@ object Plugin : Plugin {
         koin.getOrNull<InlineTemplatesRepo>() ?.apply {
             addTemplate(
                 OfferTemplate(
-                    "Start post",
-                    listOf(Format("/start_post"))
+                    "Start post creating",
+                    listOf(Format("/start_post")),
+                    "Use this command to start creating of complex post with several messages"
+                )
+            )
+            addTemplate(
+                OfferTemplate(
+                    "Finish post creating",
+                    listOf(Format("/finish_post")),
+                    "Finish creating of complex post"
                 )
             )
         }

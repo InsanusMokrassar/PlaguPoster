@@ -18,11 +18,13 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.buildEntities
 import dev.inmo.tgbotapi.extensions.utils.formatting.regular
 import dev.inmo.tgbotapi.extensions.utils.mediaGroupMessageOrNull
+import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MessageContent
@@ -66,7 +68,7 @@ object Plugin : Plugin {
                         waitContentMessage(
                             includeMediaGroups = false
                         ).filter {
-                            it.chat.id == state.context
+                            it.chat.id == state.context && it.content.textContentOrNull() ?.text != "/finish_post"
                         }.take(1).first()
                     )
                 }
@@ -82,8 +84,8 @@ object Plugin : Plugin {
                     emptyList<ContentMessage<MessageContent>>()
                 }
                 add {
-                    val finishPressed = waitCommandMessage("finish_post").filter {
-                        it.sameChat(messageToDelete)
+                    val finishPressed = waitTextMessage().filter {
+                        it.sameChat(messageToDelete) && it.content.text == "/finish_post"
                     }.first()
                     emptyList<ContentMessage<MessageContent>>()
                 }

@@ -5,9 +5,9 @@ import dev.inmo.micro_utils.fsm.common.State
 import dev.inmo.micro_utils.repos.create
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.*
-import dev.inmo.plaguposter.inlines.models.Format
-import dev.inmo.plaguposter.inlines.models.OfferTemplate
-import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.plugins.inline.queries.models.Format
+import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
+import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.registrar.state.RegistrationState
 import dev.inmo.plaguposter.posts.repo.PostsRepo

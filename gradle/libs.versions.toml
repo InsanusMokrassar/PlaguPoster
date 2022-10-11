@@ -9,6 +9,7 @@ microutils = "0.12.16"
 kslog = "0.5.2"
 krontab = "0.8.1"
 tgbotapi-libraries = "0.5.5"
+plagubot-plugins = "0.4.1"
 
 psql = "42.5.0"
 
@@ -36,6 +37,7 @@ android-test-espresso-core = { module = "androidx.test.espresso:espresso-core", 
 tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }
 plagubot-plugin = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubot" }
 plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
+plagubot-plugins-inline-queries = { module = "dev.inmo:plagubot.plugins.inline.queries", version.ref = "plagubot-plugins" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }

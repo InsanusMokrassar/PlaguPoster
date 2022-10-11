@@ -11,9 +11,9 @@ import dev.inmo.micro_utils.repos.pagination.getAll
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.*
-import dev.inmo.plaguposter.inlines.models.Format
-import dev.inmo.plaguposter.inlines.models.OfferTemplate
-import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.plugins.inline.queries.models.Format
+import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
+import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.panel.PanelButtonBuilder
 import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI

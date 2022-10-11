@@ -10,9 +10,9 @@ import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.common.UnsuccessfulSymbol
 import dev.inmo.plaguposter.posts.exposed.ExposedPostsRepo
 import dev.inmo.plaguposter.common.ChatConfig
-import dev.inmo.plaguposter.inlines.models.Format
-import dev.inmo.plaguposter.inlines.models.OfferTemplate
-import dev.inmo.plaguposter.inlines.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.plugins.inline.queries.models.Format
+import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
+import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.posts.repo.*
 import dev.inmo.plaguposter.posts.sending.PostPublisher
 import dev.inmo.tgbotapi.extensions.api.delete

@@ -4,13 +4,7 @@ project.group = "$group"
 // apply from: "$publishGradlePath"
 
 kotlin {
-    jvm {
-        compilations.main {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    jvm()
     js (IR) {
         browser()
         nodejs()
@@ -42,10 +36,5 @@ kotlin {
         }
 
     }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 

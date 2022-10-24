@@ -1,7 +1,6 @@
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.plugin.serialization"
-    id "com.android.library"
 }
 
 apply from: "$mppProjectWithSerializationPresetPath"
@@ -13,10 +12,6 @@ kotlin {
                 api project(":plaguposter.common")
                 api project(":plaguposter.ratings")
                 api project(":plaguposter.posts.panel")
-            }
-        }
-        jvmMain {
-            dependencies {
             }
         }
     }

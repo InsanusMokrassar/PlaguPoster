@@ -38,6 +38,7 @@ import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineK
 import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
 import dev.inmo.tgbotapi.utils.buildEntities
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -108,6 +109,9 @@ object Plugin : Plugin {
                     pollsToPostsIdsRepo.set(sent.content.poll.id, postId)
                     pollsToMessageInfoRepo.set(sent.content.poll.id, sent.short())
                 }.getOrNull() ?: continue
+
+                delay(500L)
+
                 panelApi ?.forceRefresh(postId)
                 return true
             }
@@ -139,6 +143,7 @@ object Plugin : Plugin {
 
         if (config.autoAttach) {
             postsRepo.newObjectsFlow.subscribeSafelyWithoutExceptions(this) {
+                delay(500L)
                 attachPoll(it.id)
             }
         }

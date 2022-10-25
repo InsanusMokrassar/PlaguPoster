@@ -1,1 +1,1 @@
-package dev.inmo.plaguposter.inlines
+package dev.inmo.plagubot.plugins.inline.queries

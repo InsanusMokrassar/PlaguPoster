@@ -4,21 +4,12 @@ project.group = "$group"
 // apply from: "$publishGradlePath"
 
 kotlin {
-    jvm {
-        compilations.main {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-    }
+    jvm()
     js (IR) {
         browser()
         nodejs()
     }
-    android {
-        publishAllLibraryVariants()
-    }
-
+    
     sourceSets {
         commonMain {
             dependencies {
@@ -43,19 +34,7 @@ kotlin {
                 implementation libs.kotlin.test.junit
             }
         }
-        androidTest {
-            dependencies {
-                implementation libs.kotlin.test.junit
-                implementation libs.android.test.junit
-                implementation libs.android.test.espresso.core
-            }
-        }
+
     }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-apply from: "$defaultAndroidSettingsPresetPath"

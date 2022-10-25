@@ -12,8 +12,7 @@ import dev.inmo.tgbotapi.types.MessageIdentifier
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ExposedPostsRepo(
@@ -21,7 +20,7 @@ class ExposedPostsRepo(
 ) : PostsRepo, AbstractExposedCRUDRepo<RegisteredPost, PostId, NewPost>(
     tableName = "posts"
 ) {
-    val idColumn = text("id").clientDefault { uuid4().toString() }
+    val idColumn = text("id")
     val createdColumn = double("datetime").default(0.0)
 
     private val contentRepo by lazy {
@@ -59,18 +58,6 @@ class ExposedPostsRepo(
     override fun InsertStatement<Number>.asObject(value: NewPost): RegisteredPost {
         val id = PostId(get(idColumn))
 
-        with(contentRepo) {
-            value.content.forEach { contentInfo ->
-                insert {
-                    it[postIdColumn] = id.string
-                    it[chatIdColumn] = contentInfo.chatId.chatId
-                    it[messageIdColumn] = contentInfo.messageId
-                    it[groupColumn] = contentInfo.group
-                    it[orderColumn] = contentInfo.order
-                }
-            }
-        }
-
         return RegisteredPost(
             id,
             DateTime(get(createdColumn)),
@@ -82,7 +69,14 @@ class ExposedPostsRepo(
         )
     }
 
-    override fun update(id: PostId, value: NewPost, it: UpdateStatement) {
+    override fun createAndInsertId(value: NewPost, it: InsertStatement<Number>): PostId {
+        val id = PostId(uuid4().toString())
+        it[idColumn] = id.string
+        return id
+    }
+
+    override fun update(id: PostId?, value: NewPost, it: UpdateBuilder<Int>) {
+        id ?: error("Unable to find post id in update")
         with(contentRepo) {
             deleteWhere { postIdColumn.eq(id.string) }
             value.content.forEach { contentInfo ->
@@ -98,6 +92,7 @@ class ExposedPostsRepo(
     }
 
     override fun insert(value: NewPost, it: InsertStatement<Number>) {
+        super.insert(value, it)
         it[createdColumn] = DateTime.now().unixMillis
     }
 

@@ -6,8 +6,7 @@ import dev.inmo.plaguposter.common.ShortMessageInfo
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.PollIdentifier
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.*
 
 class ExposedPollsToMessagesInfoRepo(
     database: Database
@@ -36,14 +35,12 @@ class ExposedPollsToMessagesInfoRepo(
         initTable()
     }
 
-    override fun update(k: PollIdentifier, v: ShortMessageInfo, it: UpdateStatement) {
+    override fun update(k: PollIdentifier, v: ShortMessageInfo, it: UpdateBuilder<Int>) {
         it[chatIdColumn] = v.chatId.chatId
         it[messageIdColumn] = v.messageId
     }
 
-    override fun insert(k: PollIdentifier, v: ShortMessageInfo, it: InsertStatement<Number>) {
+    override fun insertKey(k: PollIdentifier, v: ShortMessageInfo, it: InsertStatement<Number>) {
         it[keyColumn] = k
-        it[chatIdColumn] = v.chatId.chatId
-        it[messageIdColumn] = v.messageId
     }
 }

@@ -3,6 +3,7 @@ package dev.inmo.plaguposter.posts.exposed
 import com.benasher44.uuid.uuid4
 import com.soywiz.klock.DateTime
 import dev.inmo.micro_utils.repos.KeyValuesRepo
+import dev.inmo.micro_utils.repos.UpdatedValuePair
 import dev.inmo.micro_utils.repos.exposed.AbstractExposedCRUDRepo
 import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.plaguposter.posts.models.*
@@ -75,17 +76,20 @@ class ExposedPostsRepo(
         return id
     }
 
-    override fun update(id: PostId?, value: NewPost, it: UpdateBuilder<Int>) {
-        id ?: error("Unable to find post id in update")
-        with(contentRepo) {
-            deleteWhere { postIdColumn.eq(id.string) }
-            value.content.forEach { contentInfo ->
-                insert {
-                    it[postIdColumn] = id.string
-                    it[chatIdColumn] = contentInfo.chatId.chatId
-                    it[messageIdColumn] = contentInfo.messageId
-                    it[groupColumn] = contentInfo.group
-                    it[orderColumn] = contentInfo.order
+    override fun update(id: PostId?, value: NewPost, it: UpdateBuilder<Int>) {}
+
+    private fun updateContent(post: RegisteredPost) {
+        transaction(database) {
+            with(contentRepo) {
+                deleteWhere { postIdColumn.eq(post.id.string) }
+                post.content.forEach { contentInfo ->
+                    insert {
+                        it[postIdColumn] = post.id.string
+                        it[chatIdColumn] = contentInfo.chatId.chatId
+                        it[messageIdColumn] = contentInfo.messageId
+                        it[groupColumn] = contentInfo.group
+                        it[orderColumn] = contentInfo.order
+                    }
                 }
             }
         }
@@ -94,6 +98,20 @@ class ExposedPostsRepo(
     override fun insert(value: NewPost, it: InsertStatement<Number>) {
         super.insert(value, it)
         it[createdColumn] = DateTime.now().unixMillis
+    }
+
+    override suspend fun onAfterCreate(values: List<Pair<NewPost, RegisteredPost>>): List<RegisteredPost> {
+        values.forEach {
+            updateContent(it.second)
+        }
+        return super.onAfterCreate(values)
+    }
+
+    override suspend fun onAfterUpdate(value: List<UpdatedValuePair<NewPost, RegisteredPost>>): List<RegisteredPost> {
+        value.forEach {
+            updateContent(it.second)
+        }
+        return super.onAfterUpdate(value)
     }
 
     override suspend fun deleteById(ids: List<PostId>) {

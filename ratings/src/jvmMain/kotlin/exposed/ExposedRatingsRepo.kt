@@ -6,8 +6,7 @@ import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class ExposedRatingsRepo (
@@ -25,13 +24,12 @@ class ExposedRatingsRepo (
     override val ResultRow.asObject: Rating
         get() = get(ratingsColumn).let(::Rating)
 
-    override fun update(k: PostId, v: Rating, it: UpdateStatement) {
+    override fun update(k: PostId, v: Rating, it: UpdateBuilder<Int>) {
         it[ratingsColumn] = v.double
     }
 
-    override fun insert(k: PostId, v: Rating, it: InsertStatement<Number>) {
+    override fun insertKey(k: PostId, v: Rating, it: InsertStatement<Number>) {
         it[keyColumn] = k.string
-        it[ratingsColumn] = v.double
     }
 
     private fun Query.optionallyLimit(limit: Int?) = if (limit == null) {

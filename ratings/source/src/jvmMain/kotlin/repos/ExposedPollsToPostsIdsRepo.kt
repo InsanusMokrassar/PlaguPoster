@@ -5,8 +5,7 @@ import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.tgbotapi.types.PollIdentifier
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateStatement
+import org.jetbrains.exposed.sql.statements.*
 
 class ExposedPollsToPostsIdsRepo(
     database: Database
@@ -24,12 +23,11 @@ class ExposedPollsToPostsIdsRepo(
         initTable()
     }
 
-    override fun update(k: PollIdentifier, v: PostId, it: UpdateStatement) {
+    override fun update(k: PollIdentifier, v: PostId, it: UpdateBuilder<Int>) {
         it[postIdColumn] = v.string
     }
 
-    override fun insert(k: PollIdentifier, v: PostId, it: InsertStatement<Number>) {
+    override fun insertKey(k: PollIdentifier, v: PostId, it: InsertStatement<Number>) {
         it[keyColumn] = k
-        it[postIdColumn] = v.string
     }
 }

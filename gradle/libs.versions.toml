@@ -1,15 +1,15 @@
 [versions]
 
-kotlin = "1.7.20"
+kotlin = "1.7.21"
 kotlin-serialization = "1.4.1"
 
-plagubot = "2.4.0"
-tgbotapi = "3.3.0"
-microutils = "0.13.1"
-kslog = "0.5.2"
+plagubot = "3.1.0"
+tgbotapi = "4.1.0"
+microutils = "0.14.1"
+kslog = "0.5.3"
 krontab = "0.8.1"
-tgbotapi-libraries = "0.5.6"
-plagubot-plugins = "0.5.0"
+tgbotapi-libraries = "0.6.1"
+plagubot-plugins = "0.6.1"
 
 psql = "42.5.0"
 

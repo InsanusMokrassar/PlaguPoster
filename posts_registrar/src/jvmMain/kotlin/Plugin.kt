@@ -22,12 +22,12 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.formatting.buildEntities
-import dev.inmo.tgbotapi.extensions.utils.formatting.regular
-import dev.inmo.tgbotapi.extensions.utils.mediaGroupMessageOrNull
 import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
+import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
 import dev.inmo.tgbotapi.types.message.content.MessageContent
+import dev.inmo.tgbotapi.utils.regular
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import org.koin.core.Koin
@@ -43,7 +43,7 @@ object Plugin : Plugin {
 
             val messageToDelete = send(
                 state.context,
-                buildEntities {
+                dev.inmo.tgbotapi.utils.buildEntities {
                     if (state.messages.isNotEmpty()) {
                         regular("Your message(s) has been registered. You may send new ones or push \"Finish\" to finalize your post")
                     } else {
@@ -65,17 +65,10 @@ object Plugin : Plugin {
             val newMessagesInfo = firstOf {
                 add {
                     listOf(
-                        waitContentMessage(
-                            includeMediaGroups = false
-                        ).filter {
+                        waitContentMessage().filter {
                             it.chat.id == state.context && it.content.textContentOrNull() ?.text != "/finish_post"
                         }.take(1).first()
                     )
-                }
-                add {
-                    waitMediaGroupMessages().filter {
-                        it.first().chat.id == state.context
-                    }.take(1).first()
                 }
                 add {
                     val finishPressed = waitMessageDataCallbackQuery().filter {
@@ -95,8 +88,8 @@ object Plugin : Plugin {
                     state.context,
                     state.messages
                 )
-            }.map {
-                PostContentInfo.fromMessage(it, state.messages.size)
+            }.flatMap {
+                PostContentInfo.fromMessage(it)
             }
 
             RegistrationState.InProcess(
@@ -121,25 +114,9 @@ object Plugin : Plugin {
         }
 
         onContentMessage(
-            initialFilter = { it.chat.id == config.sourceChatId && it.mediaGroupMessageOrNull() ?.mediaGroupId == null && !FirstSourceIsCommandsFilter(it) }
+            initialFilter = { it.chat.id == config.sourceChatId && !FirstSourceIsCommandsFilter(it) }
         ) {
-            startChain(RegistrationState.Finish(it.chat.id, listOf(PostContentInfo.fromMessage(it, 0))))
-        }
-
-        onMediaGroup(
-            initialFilter = { it.first().chat.id == config.sourceChatId }
-        ) {
-            startChain(
-                RegistrationState.Finish(
-                    it.first().chat.id,
-                    it.map {
-                        PostContentInfo.fromMessage(
-                            it,
-                            0
-                        )
-                    }
-                )
-            )
+            startChain(RegistrationState.Finish(it.chat.id, PostContentInfo.fromMessage(it)))
         }
         koin.getOrNull<InlineTemplatesRepo>() ?.apply {
             addTemplate(

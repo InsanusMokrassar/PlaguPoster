@@ -12,8 +12,8 @@ class ExposedPollsToPostsIdsRepo(
 ) : PollsToPostsIdsRepo, AbstractExposedKeyValueRepo<PollIdentifier, PostId>(database, "polls_to_posts") {
     override val keyColumn = text("poll_id")
     val postIdColumn = text("postId")
-    override val selectById: SqlExpressionBuilder.(PollIdentifier) -> Op<Boolean> = { keyColumn.eq(it) }
-    override val selectByValue: SqlExpressionBuilder.(PostId) -> Op<Boolean> = { postIdColumn.eq(it.string) }
+    override val selectById: ISqlExpressionBuilder.(PollIdentifier) -> Op<Boolean> = { keyColumn.eq(it) }
+    override val selectByValue: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { postIdColumn.eq(it.string) }
     override val ResultRow.asKey: PollIdentifier
         get() = get(keyColumn)
     override val ResultRow.asObject: PostId

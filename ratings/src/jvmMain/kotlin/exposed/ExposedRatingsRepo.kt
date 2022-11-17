@@ -17,8 +17,8 @@ class ExposedRatingsRepo (
 ) {
     override val keyColumn = text("post_id")
     val ratingsColumn = double("rating")
-    override val selectById: SqlExpressionBuilder.(PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
-    override val selectByValue: SqlExpressionBuilder.(Rating) -> Op<Boolean> = { ratingsColumn.eq(it.double) }
+    override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
+    override val selectByValue: ISqlExpressionBuilder.(Rating) -> Op<Boolean> = { ratingsColumn.eq(it.double) }
     override val ResultRow.asKey: PostId
         get() = get(keyColumn).let(::PostId)
     override val ResultRow.asObject: Rating

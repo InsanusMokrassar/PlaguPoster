@@ -23,6 +23,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageIdentifier
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
@@ -108,7 +109,7 @@ object Plugin : Plugin {
 
         suspend fun refreshPostMessage(
             postId: PostId,
-            chatId: ChatId,
+            chatId: IdChatIdentifier,
             messageId: MessageIdentifier
         ) {
             val post = postsRepo.getById(postId) ?: return

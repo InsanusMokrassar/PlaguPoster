@@ -28,6 +28,7 @@ tgbotapi = { module = "dev.inmo:tgbotapi", version.ref = "tgbotapi" }
 plagubot-plugin = { module = "dev.inmo:plagubot.plugin", version.ref = "plagubot" }
 plagubot-bot = { module = "dev.inmo:plagubot.bot", version.ref = "plagubot" }
 plagubot-plugins-inline-queries = { module = "dev.inmo:plagubot.plugins.inline.queries", version.ref = "plagubot-plugins" }
+plagubot-plugins-inline-buttons = { module = "dev.inmo:plagubot.plugins.inline.buttons", version.ref = "plagubot-plugins" }
 microutils-repos-common = { module = "dev.inmo:micro_utils.repos.common", version.ref = "microutils" }
 microutils-repos-exposed = { module = "dev.inmo:micro_utils.repos.exposed", version.ref = "microutils" }
 microutils-repos-cache = { module = "dev.inmo:micro_utils.repos.cache", version.ref = "microutils" }

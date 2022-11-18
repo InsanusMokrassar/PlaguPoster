@@ -4,6 +4,7 @@ import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.getAllDistinct
+import dev.inmo.micro_utils.koin.singleWithRandomQualifierAndBinds
 import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
@@ -22,10 +23,10 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessag
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
-import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageIdentifier
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
+import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.SwitchInlineQueryCurrentChatInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.message.ParseMode
 import kotlinx.coroutines.flow.first
@@ -70,9 +71,13 @@ object Plugin : Plugin {
                 }
             )
             PanelButtonsAPI(
-                getAllDistinct<PanelButtonBuilder>() + builtInButtons,
+                emptyMap(),
                 config.rootButtonText
-            )
+            ).apply {
+                (getAllDistinct<PanelButtonBuilder>() + builtInButtons).forEach {
+                    add(it)
+                }
+            }
         }
     }
 

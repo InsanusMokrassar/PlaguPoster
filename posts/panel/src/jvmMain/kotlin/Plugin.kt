@@ -4,11 +4,14 @@ import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.getAllDistinct
-import dev.inmo.micro_utils.koin.singleWithRandomQualifierAndBinds
 import dev.inmo.micro_utils.repos.deleteById
+import dev.inmo.micro_utils.repos.id
 import dev.inmo.micro_utils.repos.set
+import dev.inmo.micro_utils.repos.unset
+import dev.inmo.micro_utils.repos.value
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.ChatConfig
+import dev.inmo.plaguposter.common.UnsuccessfulSymbol
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.panel.repos.PostsMessages
 import dev.inmo.plaguposter.posts.repo.PostsRepo
@@ -16,9 +19,11 @@ import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.edit.text.editMessageText
+import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.command
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
@@ -26,9 +31,11 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageIdentifier
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
-import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.SwitchInlineQueryCurrentChatInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.message.ParseMode
+import dev.inmo.tgbotapi.utils.bold
+import dev.inmo.tgbotapi.utils.buildEntities
+import dev.inmo.tgbotapi.utils.italic
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -188,6 +195,60 @@ object Plugin : Plugin {
         api.forceRefreshFlow.subscribeSafelyWithoutExceptions(this) {
             val (chatId, messageId) = postsMessages.get(it) ?: return@subscribeSafelyWithoutExceptions
             refreshPostMessage(it, chatId, messageId)
+        }
+
+        command("panel") {
+            val reply = it.replyTo
+
+            if (reply == null) {
+                runCatchingSafely {
+                    edit(
+                        it,
+                        it.content.textSources + buildEntities {
+                            +"${UnsuccessfulSymbol}\n" + bold("Result") + ": " + italic("You should reply post content to trigger panel retrieving")
+                        }
+                    )
+                }.onFailure { _ ->
+                    reply(
+                        it,
+                        buildEntities {
+                            bold("Result") + ": " + italic("You should reply post content to trigger panel retrieving")
+                        }
+                    )
+                }
+
+                return@command
+            }
+
+            val postId = postsRepo.getIdByChatAndMessage(reply.chat.id, reply.messageId)
+            if (postId == null) {
+                runCatchingSafely {
+                    edit(
+                        it,
+                        it.content.textSources + buildEntities {
+                            +"${UnsuccessfulSymbol}\n" + bold("Result") + ": " + italic("Unable to find post related to replied message")
+                        }
+                    )
+                }.onFailure { _ ->
+                    reply(
+                        it,
+                        buildEntities {
+                            bold("Result") + ": " + italic("Unable to find post related to replied message")
+                        }
+                    )
+                }
+
+                return@command
+            }
+
+            postsMessages.get(postId) ?.let {
+                runCatchingSafely { delete(it.id, it.value) }
+                postsMessages.unset(postId)
+            }
+
+            refreshPostMessage(postId, it.chat.id, it.messageId)
+
+            postsMessages.set(postId, it.chat.id to it.messageId)
         }
     }
 }

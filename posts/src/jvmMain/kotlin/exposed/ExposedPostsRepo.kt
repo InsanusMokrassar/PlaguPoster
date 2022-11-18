@@ -151,7 +151,11 @@ class ExposedPostsRepo(
     override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageIdentifier): PostId? {
         return transaction(database) {
             with(contentRepo) {
-                select { chatIdColumn.eq(chatId.chatId).and(threadIdColumn.eq(chatId.threadId)).and(messageIdColumn.eq(messageId)) }.limit(1).firstOrNull() ?.get(postIdColumn)
+                select {
+                    chatIdColumn.eq(chatId.chatId)
+                        .and(chatId.threadId ?.let { threadIdColumn.eq(it) } ?: threadIdColumn.isNull())
+                        .and(messageIdColumn.eq(messageId))
+                }.limit(1).firstOrNull() ?.get(postIdColumn)
             } ?.let(::PostId)
         }
     }

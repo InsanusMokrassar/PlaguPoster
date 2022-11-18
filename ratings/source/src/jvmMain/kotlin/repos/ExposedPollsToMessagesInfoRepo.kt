@@ -7,6 +7,8 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.PollIdentifier
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.statements.*
 
 class ExposedPollsToMessagesInfoRepo(
@@ -21,7 +23,7 @@ class ExposedPollsToMessagesInfoRepo(
     private val messageIdColumn = long("message_id")
     override val selectById: ISqlExpressionBuilder.(PollIdentifier) -> Op<Boolean> = { keyColumn.eq(it) }
     override val selectByValue: ISqlExpressionBuilder.(ShortMessageInfo) -> Op<Boolean> = {
-        chatIdColumn.eq(it.chatId.chatId).and(threadIdColumn.eq(it.chatId.threadId)).and(
+        chatIdColumn.eq(it.chatId.chatId).and(it.chatId.threadId ?.let { threadIdColumn.eq(it) } ?: threadIdColumn.isNull()).and(
             messageIdColumn.eq(it.messageId)
         )
     }

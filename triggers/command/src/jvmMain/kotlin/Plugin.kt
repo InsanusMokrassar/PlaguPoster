@@ -69,7 +69,14 @@ object Plugin : Plugin {
                 }
             }
             val postId = messageInReply ?.let {
-                postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId)
+                postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId) ?: let { _ ->
+                    reply(
+                        it,
+                        "Unable to find any post related to the message in reply"
+                    )
+
+                    return@onCommand
+                }
             } ?: selector ?.take(1) ?.firstOrNull()
             if (postId == null) {
                 reply(

@@ -27,5 +27,5 @@ fun PostsMessages(
     { string },
     { json.encodeToString(ChatIdToMessageSerializer, this) },
     { PostId(this) },
-    { json.decodeFromString(ChatIdToMessageSerializer, this) as Pair<IdChatIdentifier, MessageIdentifier> }
+    { json.decodeFromString(ChatIdToMessageSerializer, this).let { (it.first as IdChatIdentifier) to it.second } }
 )

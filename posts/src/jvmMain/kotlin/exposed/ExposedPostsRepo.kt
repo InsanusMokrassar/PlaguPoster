@@ -105,17 +105,19 @@ class ExposedPostsRepo(
     }
 
     override suspend fun onAfterCreate(values: List<Pair<NewPost, RegisteredPost>>): List<RegisteredPost> {
-        values.forEach {
-            updateContent(it.second.copy(content = it.first.content))
+        return values.map {
+            val actual = it.second.copy(content = it.first.content)
+            updateContent(actual)
+            actual
         }
-        return super.onAfterCreate(values)
     }
 
     override suspend fun onAfterUpdate(value: List<UpdatedValuePair<NewPost, RegisteredPost>>): List<RegisteredPost> {
-        value.forEach {
-            updateContent(it.second.copy(content = it.first.content))
+        return value.map {
+            val actual = it.second.copy(content = it.first.content)
+            updateContent(actual)
+            actual
         }
-        return super.onAfterUpdate(value)
     }
 
     override suspend fun deleteById(ids: List<PostId>) {

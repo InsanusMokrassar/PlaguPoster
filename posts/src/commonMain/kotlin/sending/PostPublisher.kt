@@ -12,6 +12,7 @@ import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.utils.*
 import dev.inmo.tgbotapi.types.*
 import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
+import dev.inmo.tgbotapi.types.message.content.MediaGroupPartContent
 
 class PostPublisher(
     private val bot: TelegramBot,
@@ -37,14 +38,26 @@ class PostPublisher(
 
         sortedMessagesContents.forEach { (_, contents) ->
             contents.singleOrNull() ?.also {
-                bot.copyMessage(targetChatId, it.chatId, it.messageId)
+                runCatching {
+                    bot.copyMessage(targetChatId, it.chatId, it.messageId)
+                }.onFailure { _ ->
+                    runCatching {
+                        bot.forwardMessage(
+                            it.chatId,
+                            targetChatId,
+                            it.messageId
+                        )
+                    }.onSuccess {
+                        bot.copyMessage(targetChatId, it)
+                    }
+                }
                 return@forEach
             }
             val resultContents = contents.mapNotNull {
                 it.order to (bot.forwardMessage(toChatId = cachingChatId, fromChatId = it.chatId, messageId = it.messageId).contentMessageOrNull() ?: return@mapNotNull null)
-            }.sortedBy { it.first }.mapNotNull { (_, it) ->
-                it.withContentOrNull<MediaGroupContent>() ?: null.also { _ ->
-                    bot.copyMessage(targetChatId, it)
+            }.sortedBy { it.first }.mapNotNull { (_, forwardedMessage) ->
+                forwardedMessage.withContentOrNull<MediaGroupPartContent>() ?: null.also { _ ->
+                    bot.copyMessage(targetChatId, forwardedMessage)
                 }
             }
             resultContents.singleOrNull() ?.also {

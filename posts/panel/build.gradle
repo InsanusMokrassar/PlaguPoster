@@ -14,5 +14,10 @@ kotlin {
                 api libs.microutils.koin
             }
         }
+        jvmMain {
+            dependencies {
+                api libs.plagubot.plugins.inline.queries
+            }
+        }
     }
 }

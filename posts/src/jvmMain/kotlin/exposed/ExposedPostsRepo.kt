@@ -9,10 +9,13 @@ import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageIdentifier
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.statements.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -33,8 +36,8 @@ class ExposedPostsRepo(
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
-    override val selectById: SqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
-    override val selectByIds: SqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
+    override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
+    override val selectByIds: ISqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
     override val ResultRow.asObject: RegisteredPost
         get() {
             val id = PostId(get(idColumn))
@@ -86,6 +89,7 @@ class ExposedPostsRepo(
                     insert {
                         it[postIdColumn] = post.id.string
                         it[chatIdColumn] = contentInfo.chatId.chatId
+                        it[threadIdColumn] = contentInfo.chatId.threadId
                         it[messageIdColumn] = contentInfo.messageId
                         it[groupColumn] = contentInfo.group
                         it[orderColumn] = contentInfo.order
@@ -101,17 +105,19 @@ class ExposedPostsRepo(
     }
 
     override suspend fun onAfterCreate(values: List<Pair<NewPost, RegisteredPost>>): List<RegisteredPost> {
-        values.forEach {
-            updateContent(it.second)
+        return values.map {
+            val actual = it.second.copy(content = it.first.content)
+            updateContent(actual)
+            actual
         }
-        return super.onAfterCreate(values)
     }
 
     override suspend fun onAfterUpdate(value: List<UpdatedValuePair<NewPost, RegisteredPost>>): List<RegisteredPost> {
-        value.forEach {
-            updateContent(it.second)
+        return value.map {
+            val actual = it.second.copy(content = it.first.content)
+            updateContent(actual)
+            actual
         }
-        return super.onAfterUpdate(value)
     }
 
     override suspend fun deleteById(ids: List<PostId>) {
@@ -122,7 +128,7 @@ class ExposedPostsRepo(
         val existsIds = posts.keys.toList()
         transaction(db = database) {
             val deleted = deleteWhere(null, null) {
-                selectByIds(existsIds)
+                selectByIds(it, existsIds)
             }
             with(contentRepo) {
                 deleteWhere {
@@ -142,10 +148,14 @@ class ExposedPostsRepo(
         }
     }
 
-    override suspend fun getIdByChatAndMessage(chatId: ChatId, messageId: MessageIdentifier): PostId? {
+    override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageIdentifier): PostId? {
         return transaction(database) {
             with(contentRepo) {
-                select { chatIdColumn.eq(chatId.chatId).and(messageIdColumn.eq(messageId)) }.limit(1).firstOrNull() ?.get(postIdColumn)
+                select {
+                    chatIdColumn.eq(chatId.chatId)
+                        .and(chatId.threadId ?.let { threadIdColumn.eq(it) } ?: threadIdColumn.isNull())
+                        .and(messageIdColumn.eq(messageId))
+                }.limit(1).firstOrNull() ?.get(postIdColumn)
             } ?.let(::PostId)
         }
     }

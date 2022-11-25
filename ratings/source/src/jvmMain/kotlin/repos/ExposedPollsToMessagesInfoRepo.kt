@@ -4,8 +4,11 @@ import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.common.ShortMessageInfo
 import dev.inmo.tgbotapi.types.ChatId
+import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.PollIdentifier
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
 import org.jetbrains.exposed.sql.statements.*
 
 class ExposedPollsToMessagesInfoRepo(
@@ -16,10 +19,11 @@ class ExposedPollsToMessagesInfoRepo(
 ) {
     override val keyColumn = text("poll_id")
     private val chatIdColumn = long("chat_id")
+    private val threadIdColumn = long("thread_id").nullable().default(null)
     private val messageIdColumn = long("message_id")
-    override val selectById: SqlExpressionBuilder.(PollIdentifier) -> Op<Boolean> = { keyColumn.eq(it) }
-    override val selectByValue: SqlExpressionBuilder.(ShortMessageInfo) -> Op<Boolean> = {
-        chatIdColumn.eq(it.chatId.chatId).and(
+    override val selectById: ISqlExpressionBuilder.(PollIdentifier) -> Op<Boolean> = { keyColumn.eq(it) }
+    override val selectByValue: ISqlExpressionBuilder.(ShortMessageInfo) -> Op<Boolean> = {
+        chatIdColumn.eq(it.chatId.chatId).and(it.chatId.threadId ?.let { threadIdColumn.eq(it) } ?: threadIdColumn.isNull()).and(
             messageIdColumn.eq(it.messageId)
         )
     }
@@ -27,7 +31,7 @@ class ExposedPollsToMessagesInfoRepo(
         get() = get(keyColumn)
     override val ResultRow.asObject: ShortMessageInfo
         get() = ShortMessageInfo(
-            get(chatIdColumn).let(::ChatId),
+            IdChatIdentifier(get(chatIdColumn), get(threadIdColumn)),
             get(messageIdColumn)
         )
 
@@ -37,6 +41,7 @@ class ExposedPollsToMessagesInfoRepo(
 
     override fun update(k: PollIdentifier, v: ShortMessageInfo, it: UpdateBuilder<Int>) {
         it[chatIdColumn] = v.chatId.chatId
+        it[threadIdColumn] = v.chatId.threadId
         it[messageIdColumn] = v.messageId
     }
 

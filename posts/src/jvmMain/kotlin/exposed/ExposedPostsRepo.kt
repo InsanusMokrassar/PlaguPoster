@@ -38,9 +38,11 @@ class ExposedPostsRepo(
 
     override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
     override val selectByIds: ISqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
+    override val ResultRow.asId: PostId
+        get() = PostId(get(idColumn))
     override val ResultRow.asObject: RegisteredPost
         get() {
-            val id = PostId(get(idColumn))
+            val id = asId
             return RegisteredPost(
                 id,
                 DateTime(get(createdColumn)),

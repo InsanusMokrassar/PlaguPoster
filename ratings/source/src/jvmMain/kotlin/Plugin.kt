@@ -20,6 +20,8 @@ import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
+import dev.inmo.plaguposter.ratings.source.buttons.buildRootButtons
+import dev.inmo.plaguposter.ratings.source.buttons.includeRootNavigationButtonsHandler
 import dev.inmo.plaguposter.ratings.source.models.*
 import dev.inmo.plaguposter.ratings.source.repos.*
 import dev.inmo.plaguposter.ratings.utils.postsByRatings
@@ -34,6 +36,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
+import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
@@ -225,12 +228,22 @@ object Plugin : Plugin {
                         + "• " + bold("% 3.1f".format(it.first.double)) + ": " + bold(it.second.size.toString()) + "\n"
                     }
                 }
+                val keyboard = flatInlineKeyboard {
+                    dataButton("Interactive mode", "ratings_interactive")
+                }
                 runCatchingSafely {
-                    edit(it, textSources)
+                    edit(it, textSources, replyMarkup = keyboard)
                 }.onFailure { _ ->
-                    reply(it, textSources)
+                    reply(it, textSources, replyMarkup = keyboard)
                 }
             }
+        }
+        includeRootNavigationButtonsHandler(setOf(chatConfig.sourceChatId), ratingsRepo, postsRepo)
+        onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id == chatConfig.sourceChatId }) {
+            edit(
+                it.message,
+                ratingsRepo.buildRootButtons()
+            )
         }
 
         koin.getOrNull<InlineTemplatesRepo>() ?.apply {

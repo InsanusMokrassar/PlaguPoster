@@ -165,4 +165,10 @@ class ExposedPostsRepo(
     override suspend fun getPostCreationTime(postId: PostId): DateTime? = transaction(database) {
         select { selectById(postId) }.limit(1).firstOrNull() ?.get(createdColumn) ?.let(::DateTime)
     }
+
+    override suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo? = transaction(database) {
+        with(contentRepo) {
+            select { postIdColumn.eq(postId.string) }.limit(1).firstOrNull() ?.asObject
+        }
+    }
 }

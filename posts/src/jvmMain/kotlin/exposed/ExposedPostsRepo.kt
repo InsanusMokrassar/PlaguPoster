@@ -38,9 +38,11 @@ class ExposedPostsRepo(
 
     override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
     override val selectByIds: ISqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
+    override val ResultRow.asId: PostId
+        get() = PostId(get(idColumn))
     override val ResultRow.asObject: RegisteredPost
         get() {
-            val id = PostId(get(idColumn))
+            val id = asId
             return RegisteredPost(
                 id,
                 DateTime(get(createdColumn)),
@@ -162,5 +164,11 @@ class ExposedPostsRepo(
 
     override suspend fun getPostCreationTime(postId: PostId): DateTime? = transaction(database) {
         select { selectById(postId) }.limit(1).firstOrNull() ?.get(createdColumn) ?.let(::DateTime)
+    }
+
+    override suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo? = transaction(database) {
+        with(contentRepo) {
+            select { postIdColumn.eq(postId.string) }.limit(1).firstOrNull() ?.asObject
+        }
     }
 }

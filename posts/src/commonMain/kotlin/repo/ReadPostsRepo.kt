@@ -10,4 +10,5 @@ import dev.inmo.tgbotapi.types.MessageIdentifier
 interface ReadPostsRepo : ReadCRUDRepo<RegisteredPost, PostId> {
     suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageIdentifier): PostId?
     suspend fun getPostCreationTime(postId: PostId): DateTime?
+    suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo?
 }

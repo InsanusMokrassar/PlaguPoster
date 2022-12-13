@@ -3,6 +3,7 @@ package dev.inmo.plaguposter.triggers.timer
 import com.soywiz.klock.DateTime
 import com.soywiz.klock.DateTimeTz
 import com.soywiz.klock.Month
+import com.soywiz.klock.Year
 import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.tgbotapi.extensions.api.answers.answer
@@ -116,7 +117,7 @@ object ButtonsBuilder {
                 }
             }
         ) { newValue, oldDateTime ->
-            oldDateTime.copyDayOfMonth(hours = newValue)
+            oldDateTime.copyDayOfMonth(hours = newValue) // TODO::Fix issue in case of local and utc diff
         }
 
         buildStandardDataCallbackQuery(
@@ -132,7 +133,7 @@ object ButtonsBuilder {
                 }
             }
         ) { newValue, oldDateTime ->
-            oldDateTime.copyDayOfMonth(minutes = newValue)
+            oldDateTime.copyDayOfMonth(minutes = newValue) // TODO::Fix issue in case of local and utc diff
         }
 
         buildStandardDataCallbackQuery(
@@ -148,7 +149,7 @@ object ButtonsBuilder {
                 }
             }
         ) { newValue, oldDateTime ->
-            oldDateTime.copyDayOfMonth(dayOfMonth = newValue)
+            oldDateTime.copyDayOfMonth(dayOfMonth = newValue) // TODO::Fix issue in case of local and utc diff
         }
 
         buildStandardDataCallbackQuery(
@@ -164,7 +165,7 @@ object ButtonsBuilder {
                 }
             }
         ) { newValue, oldDateTime ->
-            oldDateTime.copyDayOfMonth(month = Month(newValue))
+            oldDateTime.copyDayOfMonth(month = Month(newValue)) // TODO::Fix issue in case of local and utc diff
         }
 
         buildStandardDataCallbackQuery(
@@ -173,7 +174,7 @@ object ButtonsBuilder {
                 (it.year.year .. (it.year.year + 5))
             }
         ) { newValue, oldDateTime ->
-            oldDateTime.copyDayOfMonth(month = Month(newValue))
+            oldDateTime.copyDayOfMonth(year = Year(newValue)) // TODO::Fix issue in case of local and utc diff
         }
     }
 }

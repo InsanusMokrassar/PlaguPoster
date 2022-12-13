@@ -101,16 +101,36 @@ object ButtonsBuilder {
             }
         }
 
+        fun DateTimeTz.dateEq(other: DateTimeTz) = yearInt == other.yearInt && month0 == other.month0 && dayOfMonth == other.dayOfMonth
+
         buildStandardDataCallbackQuery(
             changeHoursDataPrefix,
-            (0 until 24).toList().let { { _ -> it } } // TODO::Add filter of hours which are in the past
+            {
+                val now = DateTime.now().local
+                val local = it.local
+
+                if (now.dateEq(local)) {
+                    now.hours .. 23
+                } else {
+                    0 .. 23
+                }
+            }
         ) { newValue, oldDateTime ->
             oldDateTime.copyDayOfMonth(hours = newValue)
         }
 
         buildStandardDataCallbackQuery(
             changeMinutesDataPrefix,
-            (0 until 60).toList().let { { _ -> it } } // TODO::Add filter of hours which are in the past
+            {
+                val now = DateTime.now().local
+                val local = it.local
+
+                if (now.dateEq(local)) {
+                    now.minutes .. 60
+                } else {
+                    0 .. 60
+                }
+            }
         ) { newValue, oldDateTime ->
             oldDateTime.copyDayOfMonth(minutes = newValue)
         }
@@ -118,17 +138,31 @@ object ButtonsBuilder {
         buildStandardDataCallbackQuery(
             changeDayDataPrefix,
             {
-                val days = it.month.days(it.year)
+                val now = DateTime.now().local
+                val local = it.local
 
-                1 .. days
-            } // TODO::Add filter of hours which are in the past
+                if (now.dateEq(local)) {
+                    now.dayOfMonth .. it.month.days(it.year)
+                } else {
+                    1 .. it.month.days(it.year)
+                }
+            }
         ) { newValue, oldDateTime ->
             oldDateTime.copyDayOfMonth(dayOfMonth = newValue)
         }
 
         buildStandardDataCallbackQuery(
             changeMonthDataPrefix,
-            (1 .. 12).toList().let { { _ -> it } } // TODO::Add filter of hours which are in the past
+            {
+                val now = DateTime.now().local
+                val local = it.local
+
+                if (now.year == local.year) {
+                    now.month1 .. 12
+                } else {
+                    1 .. 12
+                }
+            }
         ) { newValue, oldDateTime ->
             oldDateTime.copyDayOfMonth(month = Month(newValue))
         }

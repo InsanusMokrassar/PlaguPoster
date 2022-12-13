@@ -7,4 +7,6 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class PostId(
     val string: String
-)
+) {
+    override fun toString(): String = string
+}

@@ -47,7 +47,7 @@ object ButtonsBuilder {
             dateConverter: (Int) -> DateTimeTz
         ): InlineKeyboardMarkup {
             return inlineKeyboard {
-                values.chunked(5).forEach {
+                values.chunked(6).forEach {
                     row {
                         it.forEach {
                             dataButton(it.toString(), "$prefix $postId ${dateConverter(it).utc.unixMillisLong.coerceAtLeast(min.unixMillisLong)}")

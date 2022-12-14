@@ -7,15 +7,19 @@
   },
   "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "plugins": [
-    "dev.inmo.plagubot.plugins.inline.queries.Plugin",
     "dev.inmo.plaguposter.posts.Plugin",
     "dev.inmo.plaguposter.posts.registrar.Plugin",
     "dev.inmo.plaguposter.ratings.Plugin",
     "dev.inmo.plaguposter.ratings.source.Plugin",
     "dev.inmo.plaguposter.ratings.selector.Plugin",
     "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
+    "dev.inmo.plagubot.plugins.inline.queries.Plugin",
     "dev.inmo.plaguposter.triggers.command.Plugin",
-    "dev.inmo.plaguposter.posts.panel.Plugin"
+    "dev.inmo.plaguposter.posts.panel.Plugin",
+    "dev.inmo.plaguposter.common.CommonPlugin",
+    "dev.inmo.plaguposter.triggers.timer.Plugin",
+    "dev.inmo.plaguposter.triggers.timer.disablers.ratings.Plugin",
+    "dev.inmo.plaguposter.triggers.timer.disablers.autoposts.Plugin"
   ],
   "posts": {
     "chats": {

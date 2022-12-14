@@ -10,8 +10,8 @@ kotlin {
         commonMain {
             dependencies {
                 api project(":plaguposter.common")
-                api project(":plaguposter.posts")
-                api project(":plaguposter.posts.panel")
+                api project(":plaguposter.triggers.timer")
+                api project(":plaguposter.triggers.selector_with_timer")
             }
         }
     }

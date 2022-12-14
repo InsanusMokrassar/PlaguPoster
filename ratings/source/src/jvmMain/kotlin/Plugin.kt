@@ -101,6 +101,7 @@ object Plugin : Plugin {
             }
 
             val post = postsRepo.getById(postId) ?: return false
+            ratingsRepo.set(postId, Rating(0.0))
             for (content in post.content) {
                 runCatchingSafely {
                     val sent = send(
@@ -140,7 +141,7 @@ object Plugin : Plugin {
             }
         }
 
-        postsRepo.deletedObjectsIdsFlow.subscribeSafelyWithoutExceptions(this) { postId ->
+        ratingsRepo.onValueRemoved.subscribeSafelyWithoutExceptions(this) { postId ->
             detachPoll(postId)
         }
 

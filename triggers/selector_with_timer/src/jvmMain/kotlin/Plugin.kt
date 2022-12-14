@@ -34,9 +34,12 @@ object Plugin : Plugin {
     override suspend fun BehaviourContext.setupBotPlugin(koin: Koin) {
         val publisher = koin.get<PostPublisher>()
         val selector = koin.get<Selector>()
-        koin.get<Config>().krontab.asFlow().subscribeSafelyWithoutExceptions(this) {
-            selector.take(now = it).forEach { postId ->
-                publisher.publish(postId)
+        val filters = koin.getAll<AutopostFilter>().distinct()
+        koin.get<Config>().krontab.asFlow().subscribeSafelyWithoutExceptions(this) { dateTime ->
+            selector.take(now = dateTime).forEach { postId ->
+                if (filters.all { it.check(postId, dateTime) }) {
+                    publisher.publish(postId)
+                }
             }
         }
     }

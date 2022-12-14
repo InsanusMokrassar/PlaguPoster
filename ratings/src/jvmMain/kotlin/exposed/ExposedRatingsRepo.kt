@@ -1,6 +1,7 @@
 package dev.inmo.plaguposter.ratings.exposed
 
 import dev.inmo.micro_utils.pagination.utils.optionallyReverse
+import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -23,6 +24,10 @@ class ExposedRatingsRepo (
         get() = get(keyColumn).let(::PostId)
     override val ResultRow.asObject: Rating
         get() = get(ratingsColumn).let(::Rating)
+
+    init {
+        initTable()
+    }
 
     override fun update(k: PostId, v: Rating, it: UpdateBuilder<Int>) {
         it[ratingsColumn] = v.double

@@ -34,7 +34,7 @@ object ButtonsBuilder {
     private const val changeDateDataPrefix = "timer_s"
     private const val cancelDateData = "timer_c"
     private const val deleteDateDataPrefix = "timer_r"
-    val datePrintFormat = DateFormat("hh:mm, dd.MM.yyyy, zzz")
+    val datePrintFormat = DateFormat("HH:mm, dd.MM.yyyy, zzz")
 
     fun buildTimerButtons(
         postId: PostId,

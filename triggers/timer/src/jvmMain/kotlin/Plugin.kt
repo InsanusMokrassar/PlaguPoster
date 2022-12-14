@@ -2,11 +2,13 @@ package dev.inmo.plaguposter.triggers.timer
 
 import com.soywiz.klock.DateTime
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
+import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.singleWithRandomQualifierAndBinds
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
+import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI
 import dev.inmo.plaguposter.posts.repo.ReadPostsRepo
 import dev.inmo.plaguposter.triggers.timer.repo.ExposedTimersRepo
 import dev.inmo.tgbotapi.extensions.api.answers.answer
@@ -16,6 +18,7 @@ import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
@@ -32,12 +35,23 @@ object Plugin : Plugin {
     override suspend fun BehaviourContext.setupBotPlugin(koin: Koin) {
         val timersRepo = koin.get<TimersRepo>()
         val chatsConfig = koin.get<ChatConfig>()
+        val panelApi = koin.get<PanelButtonsAPI>()
+        val scope = koin.get<CoroutineScope>()
         with(ButtonsBuilder) {
             includeKeyboardHandling(timersRepo) { postId, dateTime ->
                 timersRepo.set(postId, dateTime)
                 true
             }
         }
+
+        timersRepo.onNewValue.subscribeSafelyWithoutExceptions(scope) {
+            panelApi.forceRefresh(it.first)
+        }
+
+        timersRepo.onValueRemoved.subscribeSafelyWithoutExceptions(scope) {
+            panelApi.forceRefresh(it)
+        }
+
         onMessageDataCallbackQuery(
             Regex("${TimerPanelButton.timerSetPrefix} [^\\s]+"),
             initialFilter = {

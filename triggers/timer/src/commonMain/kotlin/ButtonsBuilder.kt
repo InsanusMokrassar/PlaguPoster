@@ -4,8 +4,11 @@ import com.soywiz.klock.DateTime
 import com.soywiz.klock.DateTimeTz
 import com.soywiz.klock.Month
 import com.soywiz.klock.Year
+import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.plaguposter.common.SuccessfulSymbol
+import dev.inmo.plaguposter.posts.models.Post
 import dev.inmo.plaguposter.posts.models.PostId
+import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onMessageDataCallbackQuery
@@ -38,7 +41,9 @@ object ButtonsBuilder {
         dataButton(SuccessfulSymbol, "$changeDateDataPrefix $postId $unixMillis")
     }
 
-    suspend fun BehaviourContext.includeKeyboardHandling() {
+    suspend fun BehaviourContext.includeKeyboardHandling(
+        onSavePublishingTime: suspend (PostId, DateTime) -> Boolean
+    ) {
         fun buildKeyboard(
             prefix: String,
             postId: PostId,
@@ -178,6 +183,22 @@ object ButtonsBuilder {
             DateTimeTz.local(
                 oldDateTime.local.copyDayOfMonth(year = Year(newValue)),
                 oldDateTime.offset
+            )
+        }
+
+        onMessageDataCallbackQuery(Regex("$changeDateDataPrefix .*")) {
+            val (_, rawPostId, rawDateTimeMillis) = it.data.split(" ")
+            val currentMillis = rawDateTimeMillis.toLongOrNull() ?: return@onMessageDataCallbackQuery
+            val currentDateTime = DateTime(currentMillis)
+            val postId = PostId(rawPostId)
+
+            val success = runCatchingSafely {
+                onSavePublishingTime(postId, currentDateTime)
+            }.getOrElse { false }
+
+            answer(
+                it,
+                if (success) "Successfully set timer" else "Unable to set timer"
             )
         }
     }

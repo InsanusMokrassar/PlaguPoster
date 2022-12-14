@@ -43,15 +43,15 @@ object ButtonsBuilder {
     ) = inlineKeyboard {
         val unixMillis = dateTime.utc.unixMillisLong
         row {
-            dataButton("Time:", changeTimeData)
+            dataButton("Time (hh:mm):", changeTimeData)
             dataButton(dateTime.hours.toString(), "$changeHoursDataPrefix $postId $unixMillis")
             dataButton(dateTime.minutes.toString(), "$changeMinutesDataPrefix $postId $unixMillis")
         }
         row {
-            dataButton("Date:", changeDateData)
-            dataButton(dateTime.dayOfMonth.toString(), "$changeDayDataPrefix $postId $unixMillis")
-            dataButton(dateTime.month1.toString(), "$changeMonthDataPrefix $postId $unixMillis")
-            dataButton(dateTime.yearInt.toString(), "$changeYearDataPrefix $postId $unixMillis")
+            dataButton("Date (dd.mm.yyyy):", changeDateData)
+            dataButton("${dateTime.dayOfMonth}", "$changeDayDataPrefix $postId $unixMillis")
+            dataButton("${dateTime.month1}", "$changeMonthDataPrefix $postId $unixMillis")
+            dataButton("${dateTime.yearInt}", "$changeYearDataPrefix $postId $unixMillis")
         }
 
         row {
@@ -96,6 +96,7 @@ object ButtonsBuilder {
         }
 
         suspend fun buildStandardDataCallbackQuery(
+            name: String,
             prefix: String,
             possibleValues: (DateTimeTz) -> Iterable<Int>,
             dateTimeConverter: (Int, DateTimeTz) -> DateTimeTz
@@ -104,18 +105,24 @@ object ButtonsBuilder {
             onMessageDataCallbackQuery(Regex("$prefix .+")) {
                 val (_, rawPostId, rawDateTimeMillis) = it.data.split(" ")
                 val currentMillis = rawDateTimeMillis.toLongOrNull() ?: return@onMessageDataCallbackQuery
-                val currentDateTime = DateTime(currentMillis).local
+                val currentDateTime = DateTime(currentMillis)
+                val currentDateTimeLocal = DateTime(currentMillis).local
+                val postId = PostId(rawPostId)
+                val previousTime = timersRepo.get(postId)
 
                 edit (
-                    it.message,
+                    it.message.withContentOrNull() ?: return@onMessageDataCallbackQuery,
                     replyMarkup = buildKeyboard(
                         setPrefix,
-                        PostId(rawPostId),
-                        possibleValues(currentDateTime)
+                        postId,
+                        possibleValues(currentDateTimeLocal)
                     ) {
-                        dateTimeConverter(it, currentDateTime)
+                        dateTimeConverter(it, currentDateTimeLocal)
                     }
-                )
+                ) {
+                    +buildTimerTextSources(currentDateTime, previousTime) + "\n"
+                    +"You are about to edit $name"
+                }
             }
 
             onMessageDataCallbackQuery(Regex("$setPrefix .+")) {
@@ -141,6 +148,7 @@ object ButtonsBuilder {
         fun DateTimeTz.dateEq(other: DateTimeTz) = yearInt == other.yearInt && month0 == other.month0 && dayOfMonth == other.dayOfMonth
 
         buildStandardDataCallbackQuery(
+            "hour",
             changeHoursDataPrefix,
             {
                 val now = nearestAvailableTimerTime().local
@@ -159,6 +167,7 @@ object ButtonsBuilder {
         }
 
         buildStandardDataCallbackQuery(
+            "minute",
             changeMinutesDataPrefix,
             {
                 val now = nearestAvailableTimerTime().local
@@ -177,6 +186,7 @@ object ButtonsBuilder {
         }
 
         buildStandardDataCallbackQuery(
+            "day",
             changeDayDataPrefix,
             {
                 val now = nearestAvailableTimerTime().local
@@ -195,6 +205,7 @@ object ButtonsBuilder {
         }
 
         buildStandardDataCallbackQuery(
+            "month",
             changeMonthDataPrefix,
             {
                 val now = nearestAvailableTimerTime().local
@@ -213,6 +224,7 @@ object ButtonsBuilder {
         }
 
         buildStandardDataCallbackQuery(
+            "year",
             changeYearDataPrefix,
             {
                 val now = nearestAvailableTimerTime().local

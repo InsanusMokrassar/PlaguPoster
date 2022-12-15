@@ -12,6 +12,9 @@ String[] includes = [
     ":triggers:command",
     ":triggers:selector_with_timer",
     ":triggers:selector_with_scheduling",
+    ":triggers:timer",
+    ":triggers:timer:disablers:ratings",
+    ":triggers:timer:disablers:autoposts",
     ":inlines",
 //    ":settings",
     ":runner"

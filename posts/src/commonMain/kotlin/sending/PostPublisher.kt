@@ -17,8 +17,8 @@ import dev.inmo.tgbotapi.types.message.content.MediaGroupPartContent
 class PostPublisher(
     private val bot: TelegramBot,
     private val postsRepo: PostsRepo,
-    private val cachingChatId: ChatId,
-    private val targetChatId: ChatId,
+    private val cachingChatId: IdChatIdentifier,
+    private val targetChatId: IdChatIdentifier,
     private val deleteAfterPosting: Boolean = true
 ) {
     suspend fun publish(postId: PostId) {

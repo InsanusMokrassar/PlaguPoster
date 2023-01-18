@@ -24,7 +24,7 @@ class CachedRatingsRepo(
         doForAllWithNextPaging {
             kvCache.keys(it).also {
                 it.results.forEach {
-                    val rating = kvCache.get(it) ?: return@forEach
+                    val rating = get(it) ?: return@forEach
                     if (it !in exclude && rating in range) {
                         result[it] = rating
                     }

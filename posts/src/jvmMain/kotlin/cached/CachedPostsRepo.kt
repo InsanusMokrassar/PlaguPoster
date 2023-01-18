@@ -43,7 +43,7 @@ class CachedPostsRepo(
         return null
     }
 
-    override suspend fun getPostCreationTime(postId: PostId): DateTime? = kvCache.get(postId) ?.created
+    override suspend fun getPostCreationTime(postId: PostId): DateTime? = getById(postId) ?.created
 
-    override suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo? = kvCache.get(postId) ?.content ?.firstOrNull()
+    override suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo? = getById(postId) ?.content ?.firstOrNull()
 }

@@ -65,7 +65,7 @@ object Plugin : Plugin {
             val newMessagesInfo = firstOf {
                 add {
                     listOf(
-                        waitContentMessage().filter {
+                        waitAnyContentMessage().filter {
                             it.chat.id == state.context && it.content.textContentOrNull() ?.text != "/finish_post"
                         }.take(1).first()
                     )

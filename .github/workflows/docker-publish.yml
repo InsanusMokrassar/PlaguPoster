@@ -1,0 +1,21 @@
+name: Docker
+on:
+  push:
+    branches:
+      - master
+jobs:
+  publishing:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Log into registry
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Deploy
+        run: ./gradlew build && cd ./runner && ./nonsudo_deploy.sh

@@ -4,6 +4,7 @@ import dev.inmo.kslog.common.logger
 import dev.inmo.kslog.common.w
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
+import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.SuccessfulSymbol
@@ -13,6 +14,8 @@ import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plaguposter.common.useCache
+import dev.inmo.plaguposter.posts.cached.CachedPostsRepo
 import dev.inmo.plaguposter.posts.repo.*
 import dev.inmo.plaguposter.posts.sending.PostPublisher
 import dev.inmo.tgbotapi.extensions.api.delete
@@ -44,11 +47,16 @@ object Plugin : Plugin {
         }
         single { get<Json>().decodeFromJsonElement(Config.serializer(), configJson) }
         single { get<Config>().chats }
-        single { ExposedPostsRepo(database) } binds arrayOf(
-            PostsRepo::class,
-            ReadPostsRepo::class,
-            WritePostsRepo::class,
-        )
+        single { ExposedPostsRepo(database) }
+        singleWithBinds<PostsRepo> {
+            val base = get<ExposedPostsRepo>()
+
+            if (useCache) {
+                CachedPostsRepo(base, get())
+            } else {
+                base
+            }
+        }
         single {
             val config = get<Config>()
             PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.targetChatId, config.deleteAfterPublishing)

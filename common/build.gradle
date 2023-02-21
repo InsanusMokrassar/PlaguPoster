@@ -11,7 +11,9 @@ kotlin {
             dependencies {
                 api libs.tgbotapi
                 api libs.microutils.repos.common
+                api libs.microutils.repos.cache
                 api libs.kslog
+                api libs.microutils.koin
             }
         }
         jvmMain {

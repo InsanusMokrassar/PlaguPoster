@@ -1,6 +1,9 @@
 package dev.inmo.plaguposter.ratings.source.buttons
 
 import com.soywiz.klock.DateFormat
+import dev.inmo.kslog.common.TagLogger
+import dev.inmo.kslog.common.d
+import dev.inmo.kslog.common.i
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.Pagination
@@ -63,6 +66,7 @@ suspend fun RatingsRepo.buildRatingButtons(
     postCreationTimeFormat: DateFormat = defaultPostCreationTimeFormat
 ): InlineKeyboardMarkup {
     val postsByRatings = getPosts(rating .. rating, true).keys.paginate(pagination)
+    TagLogger("RatingsButtonsBuilder").i { postsByRatings.results }
     return inlineKeyboard {
         if (postsByRatings.pagesNumber > 1) {
             row {
@@ -75,7 +79,7 @@ suspend fun RatingsRepo.buildRatingButtons(
                 }
             }
         }
-        postsByRatings.results.chunked(rowSize).map {
+        postsByRatings.results.chunked(rowSize).forEach {
             row {
                 it.forEach { postId ->
                     val firstMessageInfo = postsRepo.getFirstMessageInfo(postId) ?: return@forEach

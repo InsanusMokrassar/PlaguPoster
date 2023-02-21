@@ -67,8 +67,29 @@ object Plugin : Plugin {
             get<Json>().decodeFromJsonElement(Config.serializer(), params["ratingsPolls"] ?: error("Unable to load config for rating polls in $params"))
         }
         single<RatingsVariants>(ratingVariantsQualifier) { get<Config>().variants }
-        single<PollsToPostsIdsRepo> { ExposedPollsToPostsIdsRepo(database) }
-        single<PollsToMessagesInfoRepo> { ExposedPollsToMessagesInfoRepo(database) }
+
+        single { ExposedPollsToPostsIdsRepo(database) }
+        single<PollsToPostsIdsRepo> {
+            val base = get<ExposedPollsToPostsIdsRepo>()
+
+            if (useCache) {
+                CachedPollsToPostsIdsRepo(base, get())
+            } else {
+                base
+            }
+        }
+
+        single { ExposedPollsToMessagesInfoRepo(database) }
+        single<PollsToMessagesInfoRepo> {
+            val base = get<ExposedPollsToMessagesInfoRepo>()
+
+            if (useCache) {
+                CachedPollsToMessagesInfoRepo(base, get())
+            } else {
+                base
+            }
+        }
+
         single<VariantTransformer> {
             val ratingsSettings = get<RatingsVariants>(ratingVariantsQualifier)
             VariantTransformer {

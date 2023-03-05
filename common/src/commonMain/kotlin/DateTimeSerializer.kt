@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@Serializer(DateTime::class)
 object DateTimeSerializer : KSerializer<DateTime> {
     override val descriptor: SerialDescriptor = Double.serializer().descriptor
     override fun deserialize(decoder: Decoder): DateTime = DateTime(decoder.decodeDouble())

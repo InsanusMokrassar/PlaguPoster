@@ -14,9 +14,11 @@ jobs:
       - name: Rewrite version
         run: |
           branch="`echo "${{ github.ref }}" | grep -o "[^/]*$"`"
-          cat gradle.properties | sed -e "s/^version=\([0-9\.]*\)/version=\1-branch_$branch-build${{ github.run_number }}/" > gradle.properties.tmp
-          rm gradle.properties
-          mv gradle.properties.tmp gradle.properties
+          if [[ "$branch" != "master" ]]; then
+            cat gradle.properties | sed -e "s/^version=\([0-9\.]*\)/version=\1-branch_$branch-build${{ github.run_number }}/" > gradle.properties.tmp
+            rm gradle.properties
+            mv gradle.properties.tmp gradle.properties
+          fi
       - name: Log into registry
         uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:

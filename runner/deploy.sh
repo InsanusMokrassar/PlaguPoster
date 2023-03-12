@@ -14,7 +14,7 @@ function assert_success() {
 }
 
 app=plaguposter
-version="`grep ../gradle.properties -e "^version=" | grep -e "[0-9.]*" -o`"
+version="`grep ../gradle.properties -e "^version=" | sed -e "s/version=\(.*\)/\1/"`"
 server=docker.io/insanusmokrassar
 
 assert_success ../gradlew build

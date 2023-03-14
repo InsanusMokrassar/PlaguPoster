@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11
+FROM bellsoft/liberica-openjdk-alpine:19
 
 USER 1000
 

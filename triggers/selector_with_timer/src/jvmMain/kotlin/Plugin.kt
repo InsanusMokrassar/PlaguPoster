@@ -2,7 +2,7 @@ package dev.inmo.plaguposter.triggers.selector_with_timer
 
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
-import dev.inmo.krontab.utils.asFlow
+import dev.inmo.krontab.utils.asFlowWithDelays
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.posts.sending.PostPublisher
@@ -35,7 +35,7 @@ object Plugin : Plugin {
         val publisher = koin.get<PostPublisher>()
         val selector = koin.get<Selector>()
         val filters = koin.getAll<AutopostFilter>().distinct()
-        koin.get<Config>().krontab.asFlow().subscribeSafelyWithoutExceptions(this) { dateTime ->
+        koin.get<Config>().krontab.asFlowWithDelays().subscribeSafelyWithoutExceptions(this) { dateTime ->
             selector.take(now = dateTime).forEach { postId ->
                 if (filters.all { it.check(postId, dateTime) }) {
                     publisher.publish(postId)

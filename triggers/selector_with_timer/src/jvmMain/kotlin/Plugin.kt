@@ -109,7 +109,7 @@ object Plugin : Plugin {
 
                     row {
                         urlButton(
-                            dateTime.format(dateTimeFormat),
+                            dateTime.local.format(dateTimeFormat),
                             makeLinkToMessage(post.chatId, post.messageId)
                         )
                     }
@@ -132,7 +132,7 @@ object Plugin : Plugin {
         }
 
         onMessageDataCallbackQuery(
-            Regex("^$pageCallbackDataQueryPrefix"),
+            Regex("^$pageCallbackDataQueryPrefix\\d+"),
             initialFilter = { it.message.sameChat(chatConfig.sourceChatId) }
         ) {
             val page = it.data.removePrefix(pageCallbackDataQueryPrefix).toIntOrNull() ?: let { _ ->

@@ -11,11 +11,11 @@ class DefaultSelector (
     private val ratingsRepo: RatingsRepo,
     private val postsRepo: PostsRepo
 ) : Selector {
-    override suspend fun take(n: Int, now: DateTime): List<PostId> {
+    override suspend fun take(n: Int, now: DateTime, exclude: List<PostId>): List<PostId> {
         val result = mutableListOf<PostId>()
 
         do {
-            val selected = config.active(now.time) ?.rating ?.select(ratingsRepo, postsRepo, result, now) ?: break
+            val selected = config.active(now.time) ?.rating ?.select(ratingsRepo, postsRepo, result + exclude, now) ?: break
             result.add(selected)
         } while (result.size < n)
 

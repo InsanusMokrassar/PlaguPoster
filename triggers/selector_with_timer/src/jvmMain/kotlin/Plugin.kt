@@ -15,6 +15,7 @@ import dev.inmo.micro_utils.pagination.lastIndexExclusive
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
+import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.ReadPostsRepo
@@ -62,17 +63,6 @@ object Plugin : Plugin {
     }
     override fun Module.setupDI(database: Database, params: JsonObject) {
         single { get<Json>().decodeFromJsonElement(Config.serializer(), params["timer_trigger"] ?: return@single null) }
-        singleWithRandomQualifier {
-            OfferTemplate(
-                "Autoschedule buttons",
-                listOf(
-                    Format(
-                        "/autoschedule_panel"
-                    )
-                ),
-                "Show autoscheduling publishing info"
-            )
-        }
     }
 
     @OptIn(FlowPreview::class)
@@ -82,6 +72,20 @@ object Plugin : Plugin {
         val filters = koin.getAll<AutopostFilter>().distinct()
         val chatConfig = koin.get<ChatConfig>()
         val postsRepo = koin.get<ReadPostsRepo>()
+
+        koin.getOrNull<InlineTemplatesRepo>() ?.apply {
+            addTemplate(
+                OfferTemplate(
+                    "Autoschedule buttons",
+                    listOf(
+                        Format(
+                            "/autoschedule_panel"
+                        )
+                    ),
+                    "Show autoscheduling publishing info"
+                )
+            )
+        }
 
         val krontab = koin.get<Config>().krontab
         val dateTimeFormat = koin.get<Config>().format

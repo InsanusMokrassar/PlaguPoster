@@ -7,11 +7,14 @@ import dev.inmo.krontab.utils.asFlowWithDelays
 import dev.inmo.krontab.utils.asFlowWithoutDelays
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
+import dev.inmo.micro_utils.koin.singleWithRandomQualifier
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.firstIndex
 import dev.inmo.micro_utils.pagination.lastIndexExclusive
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.plugins.inline.queries.models.Format
+import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.ReadPostsRepo
@@ -28,6 +31,7 @@ import dev.inmo.tgbotapi.extensions.utils.formatting.makeLinkToMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.urlButton
+import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.utils.row
 import kotlinx.coroutines.FlowPreview
@@ -58,6 +62,17 @@ object Plugin : Plugin {
     }
     override fun Module.setupDI(database: Database, params: JsonObject) {
         single { get<Json>().decodeFromJsonElement(Config.serializer(), params["timer_trigger"] ?: return@single null) }
+        singleWithRandomQualifier {
+            OfferTemplate(
+                "Autoschedule buttons",
+                listOf(
+                    Format(
+                        "/autoschedule_panel"
+                    )
+                ),
+                "Show autoscheduling publishing info"
+            )
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -117,7 +132,7 @@ object Plugin : Plugin {
             }
         }
 
-        onCommand("publishing_autoschedule", initialFilter = { it.sameChat(chatConfig.sourceChatId) }) {
+        onCommand("autoschedule_panel", initialFilter = { it.sameChat(chatConfig.sourceChatId) }) {
             val keyboard = buildPage()
 
             runCatchingSafely {

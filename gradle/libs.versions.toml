@@ -7,7 +7,7 @@ plagubot = "5.0.1"
 tgbotapi = "7.0.1"
 microutils = "0.17.5"
 kslog = "1.0.0"
-krontab = "0.10.0-branch_0.10.0-build171"
+krontab = "0.10.0"
 tgbotapi-libraries = "0.10.1"
 plagubot-plugins = "0.10.1"
 

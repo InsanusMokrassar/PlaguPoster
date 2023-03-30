@@ -1,10 +1,9 @@
 package dev.inmo.plaguposter.ratings.gc
 
-import com.soywiz.klock.milliseconds
 import com.soywiz.klock.seconds
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
-import dev.inmo.krontab.utils.asFlow
+import dev.inmo.krontab.utils.asFlowWithDelays
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.repos.*
 import dev.inmo.plagubot.Plugin
@@ -12,7 +11,6 @@ import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.types.MilliSeconds
 import dev.inmo.tgbotapi.types.Seconds
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -50,7 +48,7 @@ object Plugin : Plugin {
             }
         }
         config.autoclear ?.let { autoclear ->
-            autoclear.autoClearKrontab.toSchedule().asFlow().subscribeSafelyWithoutExceptions(scope) {
+            autoclear.autoClearKrontab.toSchedule().asFlowWithDelays().subscribeSafelyWithoutExceptions(scope) {
                 val dropCreatedBefore = it - (autoclear.skipPostAge ?: 0).seconds
                 ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.forEach {
                     if ((postsRepo.getPostCreationTime(it) ?: return@forEach) < dropCreatedBefore) {

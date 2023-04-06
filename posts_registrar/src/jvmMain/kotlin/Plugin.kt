@@ -18,84 +18,95 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContextWithFSM
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.*
 import dev.inmo.tgbotapi.extensions.behaviour_builder.strictlyOn
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.*
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
-import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
-import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
-import dev.inmo.tgbotapi.types.message.content.MessageContent
 import dev.inmo.tgbotapi.utils.regular
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
 import org.koin.core.Koin
 
 @Serializable
 object Plugin : Plugin {
+    @Serializable
+    data class Config(
+        val useInlineFinishingOpportunity: Boolean = true
+    )
+
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {
         val config = koin.get<ChatConfig>()
         val postsRepo = koin.get<PostsRepo>()
 
-        strictlyOn {state: RegistrationState.InProcess ->
+        strictlyOn { state: RegistrationState.InProcess ->
             val buttonUuid = "finish"
 
-            val messageToDelete = send(
-                state.context,
-                dev.inmo.tgbotapi.utils.buildEntities {
-                    if (state.messages.isNotEmpty()) {
-                        regular("Your message(s) has been registered. You may send new ones or push \"Finish\" to finalize your post")
+            val suggestionMessageDeferred = async {
+                send(
+                    state.context,
+                    dev.inmo.tgbotapi.utils.buildEntities {
+                        if (state.messages.isNotEmpty()) {
+                            regular("Your message(s) has been registered. You may send new ones or push \"Finish\" to finalize your post")
+                        } else {
+                            regular("Ok, send me your messages for new post")
+                        }
+                    },
+                    replyMarkup = if (state.messages.isNotEmpty()) {
+                        flatInlineKeyboard {
+                            dataButton(
+                                "Finish",
+                                buttonUuid
+                            )
+                        }
                     } else {
-                        regular("Ok, send me your messages for new post")
+                        null
                     }
-                },
-                replyMarkup = if (state.messages.isNotEmpty()) {
-                    flatInlineKeyboard {
-                        dataButton(
-                            "Finish",
-                            buttonUuid
-                        )
-                    }
-                } else {
-                    null
-                }
-            )
+                )
+            }
 
-            val newMessagesInfo = firstOf {
+            firstOf {
                 add {
-                    listOf(
-                        waitAnyContentMessage().filter {
-                            it.chat.id == state.context && it.content.textContentOrNull() ?.text != "/finish_post"
-                        }.take(1).first()
-                    )
+                    val receivedMessage = waitAnyContentMessage().filter {
+                        it.sameChat(state.context)
+                    }.first()
+
+                    when  {
+                        receivedMessage.content.textContentOrNull() ?.text == "/finish_post" -> {
+                            val messageToDelete = suggestionMessageDeferred.await()
+                            edit(messageToDelete, "Ok, finishing your request")
+                            RegistrationState.Finish(
+                                state.context,
+                                state.messages
+                            )
+                        }
+                        else -> {
+                            RegistrationState.InProcess(
+                                state.context,
+                                state.messages + PostContentInfo.fromMessage(receivedMessage)
+                            ).also {
+                                runCatchingSafely {
+                                    suggestionMessageDeferred.cancel()
+                                }
+                                runCatchingSafely {
+                                    delete(suggestionMessageDeferred.await())
+                                }
+                            }
+                        }
+                    }
                 }
                 add {
+                    val messageToDelete = suggestionMessageDeferred.await()
                     val finishPressed = waitMessageDataCallbackQuery().filter {
                         it.message.sameMessage(messageToDelete) && it.data == buttonUuid
                     }.first()
-                    emptyList<ContentMessage<MessageContent>>()
-                }
-                add {
-                    val finishPressed = waitTextMessage().filter {
-                        it.sameChat(messageToDelete) && it.content.text == "/finish_post"
-                    }.first()
-                    emptyList<ContentMessage<MessageContent>>()
-                }
-            }.ifEmpty {
-                edit(messageToDelete, "Ok, finishing your request")
-                return@strictlyOn RegistrationState.Finish(
-                    state.context,
-                    state.messages
-                )
-            }.flatMap {
-                PostContentInfo.fromMessage(it)
-            }
 
-            RegistrationState.InProcess(
-                state.context,
-                state.messages + newMessagesInfo
-            ).also {
-                delete(messageToDelete)
+                    edit(messageToDelete, "Ok, finishing your request")
+                    RegistrationState.Finish(
+                        state.context,
+                        state.messages
+                    )
+                }
             }
         }
 
@@ -108,12 +119,12 @@ object Plugin : Plugin {
             null
         }
 
-        onCommand("start_post", initialFilter = { it.chat.id == config.sourceChatId }) {
+        onCommand("start_post", initialFilter = { it.sameChat(config.sourceChatId) }) {
             startChain(RegistrationState.InProcess(it.chat.id, emptyList()))
         }
 
         onContentMessage(
-            initialFilter = { it.chat.id == config.sourceChatId && !FirstSourceIsCommandsFilter(it) }
+            initialFilter = { it.sameChat(config.sourceChatId) && !FirstSourceIsCommandsFilter(it) }
         ) {
             startChain(RegistrationState.Finish(it.chat.id, PostContentInfo.fromMessage(it)))
         }

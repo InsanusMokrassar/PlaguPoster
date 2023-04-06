@@ -15,7 +15,7 @@ function assert_success() {
 
 app=plaguposter
 version="`grep ../gradle.properties -e "^version=" | sed -e "s/version=\(.*\)/\1/"`"
-server=docker.io/insanusmokrassar
+server=insanusmokrassar
 
 assert_success ../gradlew build
 assert_success sudo docker build -t $app:"$version" .

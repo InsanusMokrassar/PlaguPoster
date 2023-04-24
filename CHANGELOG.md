@@ -1,5 +1,13 @@
 # PlaguPoster
 
+## 0.2.0
+
+* `Versions`:
+  * `tgbotapi`: `7.1.0`
+  * `plagubot`: `5.1.0`
+  * `krontab`: `1.0.0`
+  * `plagubot.plugins`: `0.11.0`
+
 ## 0.1.2
 
 * `Versions`:

@@ -1,5 +1,16 @@
 # PlaguPoster
 
+## 0.2.1
+
+* `Versions`:
+  * `kotlin`: `1.8.21`
+  * `tgbotapi`: `7.1.2`
+  * `plagubot`: `5.1.2`
+  * `microutils`: `0.18.1`
+  * `kslog`: `1.1.1`
+  * `plagubot.plugins`: `0.11.2`
+  * `psql`: `42.6.0`
+
 ## 0.2.0
 
 * `Versions`:

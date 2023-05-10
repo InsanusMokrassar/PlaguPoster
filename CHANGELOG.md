@@ -1,5 +1,10 @@
 # PlaguPoster
 
+## 0.2.2
+
+* `GarbageCollector`:
+  * Now on start will all clearing job done
+
 ## 0.2.1
 
 * `Versions`:

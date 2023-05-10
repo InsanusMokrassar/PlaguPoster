@@ -1,12 +1,15 @@
 package dev.inmo.plaguposter.ratings.gc
 
+import com.soywiz.klock.DateTime
 import com.soywiz.klock.seconds
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
 import dev.inmo.krontab.utils.asFlowWithDelays
+import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.repos.*
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
@@ -41,20 +44,34 @@ object Plugin : Plugin {
         val config = koin.get<Config>()
 
         config.immediateDrop ?.let { toDrop ->
-            ratingsRepo.onNewValue.subscribeSafelyWithoutExceptions(this) {
-                if (it.value <= toDrop) {
-                    postsRepo.deleteById(it.id)
+            suspend fun checkAndOptionallyDrop(postId: PostId, rating: Rating) {
+                if (rating <= toDrop) {
+                    postsRepo.deleteById(postId)
                 }
+            }
+            ratingsRepo.getAll().forEach {
+                runCatchingSafely {
+                    checkAndOptionallyDrop(it.key, it.value)
+                }
+            }
+            ratingsRepo.onNewValue.subscribeSafelyWithoutExceptions(this) {
+                checkAndOptionallyDrop(it.first, it.second)
             }
         }
         config.autoclear ?.let { autoclear ->
-            autoclear.autoClearKrontab.toSchedule().asFlowWithDelays().subscribeSafelyWithoutExceptions(scope) {
-                val dropCreatedBefore = it - (autoclear.skipPostAge ?: 0).seconds
+            suspend fun doAutoClear() {
+                val dropCreatedBefore = DateTime.now() - (autoclear.skipPostAge ?: 0).seconds
                 ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.forEach {
                     if ((postsRepo.getPostCreationTime(it) ?: return@forEach) < dropCreatedBefore) {
                         postsRepo.deleteById(it)
                     }
                 }
+            }
+            runCatchingSafely {
+                doAutoClear()
+            }
+            autoclear.autoClearKrontab.toSchedule().asFlowWithDelays().subscribeSafelyWithoutExceptions(scope) {
+                doAutoClear()
             }
         }
     }

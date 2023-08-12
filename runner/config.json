@@ -26,7 +26,9 @@
     "chats": {
       "targetChat": 12345678,
       "cacheChat": 12345678,
-      "sourceChat": 12345678
+      "sourceChat": 12345678,
+      "targetChats": [12345678],
+      "_note": "You must set targetChat or targetChats with at least one object"
     }
   },
   "ratingsPolls": {

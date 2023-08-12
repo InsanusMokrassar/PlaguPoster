@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.common
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.serializer

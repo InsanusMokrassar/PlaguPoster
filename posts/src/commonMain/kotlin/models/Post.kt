@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.posts.models
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.plaguposter.common.DateTimeSerializer
 import dev.inmo.tgbotapi.types.ChatId
 import kotlinx.serialization.Serializable

@@ -1,10 +1,10 @@
 package dev.inmo.plaguposter.triggers.timer
 
-import com.soywiz.klock.DateFormat
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.DateTimeTz
-import com.soywiz.klock.Month
-import com.soywiz.klock.Year
+import korlibs.time.DateFormat
+import korlibs.time.DateTime
+import korlibs.time.DateTimeTz
+import korlibs.time.Month
+import korlibs.time.Year
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.repos.unset
 import dev.inmo.plaguposter.common.SuccessfulSymbol

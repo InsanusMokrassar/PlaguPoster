@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.ratings.selector.models
 
-import com.soywiz.klock.*
+import korlibs.time.*
 import kotlinx.serialization.*
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor

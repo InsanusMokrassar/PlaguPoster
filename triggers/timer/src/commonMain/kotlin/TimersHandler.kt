@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.triggers.timer
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.micro_utils.coroutines.launchSafelyWithoutExceptions
 import dev.inmo.micro_utils.coroutines.plus
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions

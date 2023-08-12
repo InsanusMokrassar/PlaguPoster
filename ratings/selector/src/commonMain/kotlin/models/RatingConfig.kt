@@ -1,7 +1,7 @@
 package dev.inmo.plaguposter.ratings.selector.models
 
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.seconds
+import korlibs.time.DateTime
+import korlibs.time.seconds
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging

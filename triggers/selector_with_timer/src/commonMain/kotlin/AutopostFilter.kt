@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.triggers.selector_with_timer
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.plaguposter.posts.models.PostId
 
 fun interface AutopostFilter {

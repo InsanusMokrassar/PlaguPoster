@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.ratings.source.buttons
 
-import com.soywiz.klock.DateFormat
+import korlibs.time.DateFormat
 import dev.inmo.kslog.common.TagLogger
 import dev.inmo.kslog.common.d
 import dev.inmo.kslog.common.i

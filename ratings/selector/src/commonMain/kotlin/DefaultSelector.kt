@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.ratings.selector
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo

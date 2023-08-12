@@ -1,6 +1,5 @@
 package dev.inmo.plaguposter.common
 
-import dev.inmo.kslog.common.i
 import dev.inmo.kslog.common.iS
 import dev.inmo.kslog.common.logger
 import dev.inmo.plagubot.Plugin
@@ -27,7 +26,7 @@ object CommonPlugin : Plugin {
     override suspend fun BehaviourContext.setupBotPlugin(koin: Koin) {
         val config = koin.get<ChatConfig>()
 
-        Log.iS { "Target chat info: ${getChat(config.targetChatId)}" }
+        Log.iS { "Target chats info: ${config.allTargetChatIds.map { getChat(it) }.joinToString()}" }
         Log.iS { "Source chat info: ${getChat(config.sourceChatId)}" }
         Log.iS { "Cache chat info: ${getChat(config.cacheChatId)}" }
     }

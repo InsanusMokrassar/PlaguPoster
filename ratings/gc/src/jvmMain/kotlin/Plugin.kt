@@ -1,7 +1,7 @@
 package dev.inmo.plaguposter.ratings.gc
 
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.seconds
+import korlibs.time.DateTime
+import korlibs.time.seconds
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
 import dev.inmo.krontab.utils.asFlowWithDelays

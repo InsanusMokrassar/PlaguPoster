@@ -18,7 +18,7 @@ class PostPublisher(
     private val bot: TelegramBot,
     private val postsRepo: PostsRepo,
     private val cachingChatId: IdChatIdentifier,
-    private val targetChatId: IdChatIdentifier,
+    private val targetChatIds: List<IdChatIdentifier>,
     private val deleteAfterPosting: Boolean = true
 ) {
     suspend fun publish(postId: PostId) {
@@ -38,17 +38,19 @@ class PostPublisher(
 
         sortedMessagesContents.forEach { (_, contents) ->
             contents.singleOrNull() ?.also {
-                runCatching {
-                    bot.copyMessage(targetChatId, it.chatId, it.messageId)
-                }.onFailure { _ ->
+                targetChatIds.forEach { targetChatId ->
                     runCatching {
-                        bot.forwardMessage(
-                            it.chatId,
-                            targetChatId,
-                            it.messageId
-                        )
-                    }.onSuccess {
-                        bot.copyMessage(targetChatId, it)
+                        bot.copyMessage(targetChatId, it.chatId, it.messageId)
+                    }.onFailure { _ ->
+                        runCatching {
+                            bot.forwardMessage(
+                                it.chatId,
+                                targetChatId,
+                                it.messageId
+                            )
+                        }.onSuccess {
+                            bot.copyMessage(targetChatId, it)
+                        }
                     }
                 }
                 return@forEach
@@ -57,17 +59,23 @@ class PostPublisher(
                 it.order to (bot.forwardMessage(toChatId = cachingChatId, fromChatId = it.chatId, messageId = it.messageId).contentMessageOrNull() ?: return@mapNotNull null)
             }.sortedBy { it.first }.mapNotNull { (_, forwardedMessage) ->
                 forwardedMessage.withContentOrNull<MediaGroupPartContent>() ?: null.also { _ ->
-                    bot.copyMessage(targetChatId, forwardedMessage)
+                    targetChatIds.forEach { targetChatId ->
+                        bot.copyMessage(targetChatId, forwardedMessage)
+                    }
                 }
             }
             resultContents.singleOrNull() ?.also {
-                bot.copyMessage(targetChatId, it)
+                targetChatIds.forEach { targetChatId ->
+                    bot.copyMessage(targetChatId, it)
+                }
                 return@forEach
             } ?: resultContents.chunked(mediaCountInMediaGroup.last).forEach {
-                bot.send(
-                    targetChatId,
-                    it.map { it.content.toMediaGroupMemberTelegramMedia() }
-                )
+                targetChatIds.forEach { targetChatId ->
+                    bot.send(
+                        targetChatId,
+                        it.map { it.content.toMediaGroupMemberTelegramMedia() }
+                    )
+                }
             }
         }
 

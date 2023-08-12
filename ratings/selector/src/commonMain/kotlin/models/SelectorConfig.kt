@@ -1,7 +1,7 @@
 package dev.inmo.plaguposter.ratings.selector.models
 
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.Time
+import korlibs.time.DateTime
+import korlibs.time.Time
 import kotlinx.serialization.Serializable
 
 @Serializable

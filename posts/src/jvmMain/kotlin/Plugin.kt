@@ -29,7 +29,6 @@ import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
-import org.koin.dsl.binds
 
 object Plugin : Plugin {
     @Serializable
@@ -59,7 +58,7 @@ object Plugin : Plugin {
         }
         single {
             val config = get<Config>()
-            PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.targetChatId, config.deleteAfterPublishing)
+            PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.allTargetChatIds, config.deleteAfterPublishing)
         }
     }
 

@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.triggers.selector_with_timer
 
-import com.soywiz.klock.DateFormat
+import korlibs.time.DateFormat
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
 import dev.inmo.krontab.utils.asFlowWithDelays

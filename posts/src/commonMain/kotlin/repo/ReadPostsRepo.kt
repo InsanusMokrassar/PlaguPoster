@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.posts.repo
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.micro_utils.repos.ReadCRUDRepo
 import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.tgbotapi.types.ChatId

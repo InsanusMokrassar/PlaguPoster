@@ -1,5 +1,10 @@
 # PlaguPoster
 
+## 0.2.3
+
+* Add opportunity to use several target chat ids
+* Update dependencies
+
 ## 0.2.2
 
 * `GarbageCollector`:

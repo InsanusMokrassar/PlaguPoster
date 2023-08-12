@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.posts.cached
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
 import dev.inmo.micro_utils.pagination.utils.doForAllWithNextPaging
@@ -25,6 +25,7 @@ class CachedPostsRepo(
     parentRepo,
     kvCache,
     scope,
+    skipStartInvalidate = false,
     { it.id }
 ) {
     override val removedPostsFlow: Flow<RegisteredPost> by parentRepo::removedPostsFlow

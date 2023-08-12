@@ -1,6 +1,6 @@
 package dev.inmo.plaguposter.ratings.selector
 
-import com.soywiz.klock.DateTime
+import korlibs.time.DateTime
 import dev.inmo.plaguposter.posts.models.PostId
 
 interface Selector {

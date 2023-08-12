@@ -1,7 +1,7 @@
 package dev.inmo.plaguposter.triggers.timer
 
-import com.soywiz.klock.DateTime
-import com.soywiz.klock.minutes
+import korlibs.time.DateTime
+import korlibs.time.minutes
 
 fun nearestAvailableTimerTime() = (DateTime.now() + 1.minutes).copyDayOfMonth(
     milliseconds = 0,

@@ -1,16 +1,16 @@
 [versions]
 
-kotlin = "1.8.21"
-kotlin-serialization = "1.5.0"
+kotlin = "1.8.22"
+kotlin-serialization = "1.5.1"
 
-plagubot = "5.1.2"
-tgbotapi = "7.1.2"
-microutils = "0.18.1"
-kslog = "1.1.1"
-krontab = "1.0.0"
-plagubot-plugins = "0.11.2"
+plagubot = "7.0.0"
+tgbotapi = "9.0.0"
+microutils = "0.19.9"
+kslog = "1.1.2"
+krontab = "2.1.2"
+plagubot-plugins = "0.13.0"
 
-dokka = "1.8.10"
+dokka = "1.8.20"
 
 psql = "42.6.0"
 

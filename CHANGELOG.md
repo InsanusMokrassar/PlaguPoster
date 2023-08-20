@@ -1,5 +1,7 @@
 # PlaguPoster
 
+## 0.3.0
+
 ## 0.2.3
 
 * Add opportunity to use several target chat ids

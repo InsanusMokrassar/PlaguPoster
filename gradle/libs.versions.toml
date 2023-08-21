@@ -3,12 +3,12 @@
 kotlin = "1.8.22"
 kotlin-serialization = "1.5.1"
 
-plagubot = "7.0.0"
-tgbotapi = "9.0.0"
+plagubot = "7.1.0"
+tgbotapi = "9.1.0"
 microutils = "0.19.9"
 kslog = "1.1.2"
 krontab = "2.1.2"
-plagubot-plugins = "0.13.0"
+plagubot-plugins = "0.14.0"
 
 dokka = "1.8.20"
 

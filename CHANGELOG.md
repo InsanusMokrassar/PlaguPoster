@@ -1,5 +1,12 @@
 # PlaguPoster
 
+## 0.3.0
+
+* `Versions`:
+  * `tgbotapi`: `9.1.0`
+  * `plagubot`: `7.1.0`
+  * `plagubot-plugins`: `0.14.0`
+
 ## 0.2.3
 
 * Add opportunity to use several target chat ids

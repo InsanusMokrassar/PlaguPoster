@@ -1,131 +1,80 @@
 {
   "database": {
-    "url": "jdbc:postgresql://postgres/test_db",
-    "username": "test_user",
-    "password": "test_password",
+    "url": "jdbc:postgresql://127.0.0.1:8091/test",
+    "username": "test",
+    "password": "test",
     "driver": "org.postgresql.Driver"
   },
-  "botToken": "1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghi",
+  "botToken": "1234567890:ABCDEFGHIJKLMNOP_qrstuvwxyz12345678",
   "plugins": [
     "dev.inmo.plaguposter.posts.Plugin",
     "dev.inmo.plaguposter.posts.registrar.Plugin",
     "dev.inmo.plaguposter.ratings.Plugin",
     "dev.inmo.plaguposter.ratings.source.Plugin",
     "dev.inmo.plaguposter.ratings.selector.Plugin",
-    "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
     "dev.inmo.plaguposter.ratings.gc.Plugin",
+    "dev.inmo.plaguposter.triggers.selector_with_timer.Plugin",
     "dev.inmo.plagubot.plugins.inline.queries.Plugin",
-    "dev.inmo.plaguposter.triggers.command.Plugin"
+    "dev.inmo.plaguposter.triggers.command.Plugin",
+    "dev.inmo.plaguposter.posts.panel.Plugin",
+    "dev.inmo.plaguposter.common.CommonPlugin",
+    "dev.inmo.plaguposter.triggers.timer.Plugin",
+    "dev.inmo.plaguposter.triggers.timer.disablers.ratings.Plugin",
+    "dev.inmo.plaguposter.triggers.timer.disablers.autoposts.Plugin"
   ],
   "posts": {
     "chats": {
-      "targetChat": -1001234567890,
-      "cacheChat": -1001234567890,
-      "sourceChat": -1001234567890
-    },
-    "autoRemoveMessages": true
+      "targetChat": 12345678,
+      "cacheChat": 12345678,
+      "sourceChat": 12345678,
+      "targetChats": [12345678],
+      "_note": "You must set targetChat or targetChats with at least one object"
+    }
   },
   "ratingsPolls": {
     "variants": {
-      "Круть": 2,
-      "Ок": 1,
-      "Не ок": -1,
-      "Совсем не ок": -2,
-      "Посмотреть результаты": 0
+      "Cool": 2,
+      "Ok": 1,
+      "Not ok": -1,
+      "Inappropriate": -2,
+      "Results": 0
     },
     "autoAttach": true,
-    "ratingOfferText": "How do you like it?"
+    "ratingOfferText": "What do you think about it?"
   },
   "selector": {
     "items": [
       {
         "time": {
-          "from": "23:00",
+          "from": "00:00",
           "to": "23:59"
         },
         "rating": {
-          "min": -1.0,
-          "max": 2.0,
-          "prefer": "max",
-          "otherwise": {
-            "rating": {
-              "min": 2.0,
-              "prefer": "min",
-              "postAge": 86400
-            }
-          },
-          "postAge": 86400
+          "prefer": "max"
         }
       },
       {
         "time": {
-          "from": "00:00",
-          "to": "06:59"
+          "from": "23:59",
+          "to": "00:00"
         },
         "rating": {
-          "min": -1.0,
-          "max": 2.0,
-          "prefer": "max",
-          "otherwise": {
-            "rating": {
-              "min": 2.0,
-              "prefer": "min",
-              "postAge": 86400
-            }
-          },
-          "postAge": 86400
-        }
-      },
-      {
-        "time": {
-          "from": "07:00",
-          "to": "12:00"
-        },
-        "rating": {
-          "min": 1.0,
-          "prefer": "min",
-          "otherwise": {
-            "rating": {
-              "max": 1.0,
-              "prefer": "max",
-              "postAge": 86400
-            }
-          },
-          "postAge": 86400
-        }
-      },
-      {
-        "time": {
-          "from": "12:00",
-          "to": "16:00"
-        },
-        "rating": {
-          "min": 2.0,
-          "prefer": "min",
-          "otherwise": {
-            "rating": {
-              "max": 2.0,
-              "prefer": "max",
-              "postAge": 86400
-            }
-          },
-          "postAge": 86400
-        }
-      },
-      {
-        "time": {
-          "from": "16:00",
-          "to": "23:00"
-        },
-        "rating": {
-          "prefer": "max",
-          "postAge": 86400
+          "prefer": "max"
         }
       }
     ]
   },
   "timer_trigger": {
-    "krontab": "0 30 */5 * *"
+    "krontab": "0 30 2/4 * *"
+  },
+  "panel": {
+    "textPrefix": "Post management:",
+    "buttonsPerRow": 2,
+    "parseMode": "MarkdownV2",
+    "deleteButtonText": "Delete"
+  },
+  "publish_command": {
+    "panelButtonText": "Publish"
   },
   "gc": {
     "autoclear": {
@@ -133,6 +82,6 @@
       "autoClearKrontab": "0 0 0 * *",
       "skipPostAge": 86400
     },
-    "immediateDrop": -2
+    "immediateDrop": -6
   }
 }

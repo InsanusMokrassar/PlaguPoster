@@ -2,22 +2,22 @@ version: "3.4"
 
 services:
   plaguposter_postgres:
-    image: postgres
+    image: postgres:15.4-bullseye
     container_name: "plaguposter_postgres"
     restart: "unless-stopped"
     environment:
-      POSTGRES_USER: "${PG_USER}"
-      POSTGRES_PASSWORD: "${PG_PASSWORD}"
-      POSTGRES_DB: "${PG_DB}"
+      POSTGRES_USER: "test"
+      POSTGRES_PASSWORD: "test"
+      POSTGRES_DB: "test"
     volumes:
-      - "${DATA_PATH}/db/:/var/lib/postgresql/"
+      - "./db/:/var/lib/postgresql/data"
+    ports:
+      - "127.0.0.1:8091:5432"
   plaguposter:
-    image: insanusmokrassar/plaguposter
+    image: insanusmokrassar/plaguposter:latest
     container_name: "plaguposter"
     restart: "unless-stopped"
     volumes:
-      - "${DATA_PATH}/config.json:/config.json"
-    links:
-      - "plaguposter_postgres:postgres"
+      - "./config.json:/config.json"
     depends_on:
       - "plaguposter_postgres"

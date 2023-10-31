@@ -33,11 +33,11 @@
   },
   "ratingsPolls": {
     "variants": {
-      "Круть": 2,
-      "Ок": 1,
-      "Не ок": -1,
-      "Совсем не ок": -2,
-      "Посмотреть результаты": 0
+      "Cool": 2,
+      "Ok": 1,
+      "Not ok": -1,
+      "Inappropriate": -2,
+      "Results": 0
     },
     "autoAttach": true,
     "ratingOfferText": "What do you think about it?"

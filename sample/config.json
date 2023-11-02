@@ -1,6 +1,6 @@
 {
   "database": {
-    "url": "jdbc:postgresql://127.0.0.1:8091/test",
+    "url": "jdbc:postgresql://postgres:5432/test",
     "username": "test",
     "password": "test",
     "driver": "org.postgresql.Driver"

@@ -11,8 +11,6 @@ services:
       POSTGRES_DB: "test"
     volumes:
       - "./db/:/var/lib/postgresql/data"
-    ports:
-      - "127.0.0.1:8091:5432"
   plaguposter:
     image: insanusmokrassar/plaguposter:latest
     container_name: "plaguposter"
@@ -21,3 +19,5 @@ services:
       - "./config.json:/config.json"
     depends_on:
       - "plaguposter_postgres"
+    links:
+      - "plaguposter_postgres:postgres"

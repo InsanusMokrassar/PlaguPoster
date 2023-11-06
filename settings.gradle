@@ -4,6 +4,7 @@ String[] includes = [
     ":common",
     ":posts",
     ":posts:panel",
+    ":posts:gc",
     ":posts_registrar",
     ":ratings",
     ":ratings:source",

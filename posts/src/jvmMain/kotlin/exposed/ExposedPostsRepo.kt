@@ -26,6 +26,7 @@ class ExposedPostsRepo(
 ) {
     val idColumn = text("id")
     val createdColumn = double("datetime").default(0.0)
+    val latestUpdateColumn = double("latest_update").default(0.0)
 
     private val contentRepo by lazy {
         ExposedContentInfoRepo(
@@ -81,7 +82,9 @@ class ExposedPostsRepo(
         return id
     }
 
-    override fun update(id: PostId?, value: NewPost, it: UpdateBuilder<Int>) {}
+    override fun update(id: PostId?, value: NewPost, it: UpdateBuilder<Int>) {
+        it[latestUpdateColumn] = DateTime.now().unixMillis
+    }
 
     private fun updateContent(post: RegisteredPost) {
         transaction(database) {

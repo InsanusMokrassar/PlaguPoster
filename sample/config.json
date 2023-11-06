@@ -20,7 +20,8 @@
     "dev.inmo.plaguposter.common.CommonPlugin",
     "dev.inmo.plaguposter.triggers.timer.Plugin",
     "dev.inmo.plaguposter.triggers.timer.disablers.ratings.Plugin",
-    "dev.inmo.plaguposter.triggers.timer.disablers.autoposts.Plugin"
+    "dev.inmo.plaguposter.triggers.timer.disablers.autoposts.Plugin",
+    "dev.inmo.plaguposter.posts.gc.Plugin"
   ],
   "posts": {
     "chats": {
@@ -65,7 +66,9 @@
     ]
   },
   "timer_trigger": {
-    "krontab": "0 30 2/4 * *"
+    "krontab": "0 30 2/4 * *",
+    "retryOnPostFailureTimes": 0,
+    "_note": "retryOnPostFailureTimes will retry to publish one or several posts if posting has been failed"
   },
   "panel": {
     "textPrefix": "Post management:",
@@ -83,5 +86,10 @@
       "skipPostAge": 86400
     },
     "immediateDrop": -6
+  },
+  "messagesChecker": {
+    "krontab": "0 0 0 * *",
+    "throttlingMillis": 1000,
+    "doFullCheck": false
   }
 }

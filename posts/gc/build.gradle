@@ -1,0 +1,24 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.serialization"
+}
+
+apply from: "$mppProjectWithSerializationPresetPath"
+
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api project(":plaguposter.common")
+                api project(":plaguposter.posts")
+                api libs.microutils.koin
+                api libs.krontab
+            }
+        }
+        jvmMain {
+            dependencies {
+                api libs.plagubot.plugins.inline.queries
+            }
+        }
+    }
+}

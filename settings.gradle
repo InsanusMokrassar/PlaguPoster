@@ -4,6 +4,7 @@ String[] includes = [
     ":common",
     ":posts",
     ":posts:panel",
+    ":posts:gc",
     ":posts_registrar",
     ":ratings",
     ":ratings:source",
@@ -29,5 +30,3 @@ includes.each { originalName ->
     project.name = projectName
     project.projectDir = new File(projectDirectory)
 }
-
-enableFeaturePreview("VERSION_CATALOGS")

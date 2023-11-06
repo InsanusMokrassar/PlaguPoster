@@ -22,6 +22,7 @@ dependencies {
     api project(":plaguposter.ratings.source")
     api project(":plaguposter.ratings.selector")
     api project(":plaguposter.ratings.gc")
+    api project(":plaguposter.posts.gc")
     api project(":plaguposter.inlines")
 
     api libs.psql
@@ -32,6 +33,6 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }

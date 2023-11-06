@@ -11,7 +11,6 @@ import dev.inmo.tgbotapi.extensions.api.send.copyMessage
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.utils.*
 import dev.inmo.tgbotapi.types.*
-import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
 import dev.inmo.tgbotapi.types.message.content.MediaGroupPartContent
 
 class PostPublisher(
@@ -21,10 +20,10 @@ class PostPublisher(
     private val targetChatIds: List<IdChatIdentifier>,
     private val deleteAfterPosting: Boolean = true
 ) {
-    suspend fun publish(postId: PostId) {
+    suspend fun publish(postId: PostId): Boolean {
         val messagesInfo = postsRepo.getById(postId) ?: let {
             logger.w { "Unable to get post with id $postId for publishing" }
-            return
+            return false
         }
         val sortedMessagesContents = messagesInfo.content.groupBy { it.group }.flatMap { (group, list) ->
             if (group == null) {
@@ -35,6 +34,7 @@ class PostPublisher(
                 listOf(list.first().order to list)
             }
         }.sortedBy { it.first }
+        var haveSentMessages = false
 
         sortedMessagesContents.forEach { (_, contents) ->
             contents.singleOrNull() ?.also {
@@ -44,13 +44,16 @@ class PostPublisher(
                     }.onFailure { _ ->
                         runCatching {
                             bot.forwardMessage(
-                                it.chatId,
-                                targetChatId,
-                                it.messageId
+                                fromChatId = it.chatId,
+                                toChatId = cachingChatId,
+                                messageId = it.messageId
                             )
                         }.onSuccess {
                             bot.copyMessage(targetChatId, it)
+                            haveSentMessages = true
                         }
+                    }.onSuccess {
+                        haveSentMessages = true
                     }
                 }
                 return@forEach
@@ -61,12 +64,14 @@ class PostPublisher(
                 forwardedMessage.withContentOrNull<MediaGroupPartContent>() ?: null.also { _ ->
                     targetChatIds.forEach { targetChatId ->
                         bot.copyMessage(targetChatId, forwardedMessage)
+                        haveSentMessages = true
                     }
                 }
             }
             resultContents.singleOrNull() ?.also {
                 targetChatIds.forEach { targetChatId ->
                     bot.copyMessage(targetChatId, it)
+                    haveSentMessages = true
                 }
                 return@forEach
             } ?: resultContents.chunked(mediaCountInMediaGroup.last).forEach {
@@ -75,6 +80,7 @@ class PostPublisher(
                         targetChatId,
                         it.map { it.content.toMediaGroupMemberTelegramMedia() }
                     )
+                    haveSentMessages = true
                 }
             }
         }
@@ -83,5 +89,6 @@ class PostPublisher(
             postsRepo.deleteById(postId)
         }
 
+        return haveSentMessages
     }
 }

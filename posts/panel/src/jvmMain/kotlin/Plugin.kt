@@ -4,14 +4,11 @@ import com.benasher44.uuid.uuid4
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.getAllDistinct
+import dev.inmo.micro_utils.repos.*
 import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
 import dev.inmo.micro_utils.repos.cache.cached
 import dev.inmo.micro_utils.repos.cache.full.cached
-import dev.inmo.micro_utils.repos.deleteById
-import dev.inmo.micro_utils.repos.id
-import dev.inmo.micro_utils.repos.set
-import dev.inmo.micro_utils.repos.unset
-import dev.inmo.micro_utils.repos.value
+import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.common.UnsuccessfulSymbol
@@ -99,7 +96,7 @@ object Plugin : Plugin {
         val api = koin.get<PanelButtonsAPI>()
         val basePostsMessages = PostsMessages(koin.get(), koin.get())
         val postsMessages = if (koin.useCache) {
-            basePostsMessages.cached(FullKVCache(), koin.get())
+            basePostsMessages.fullyCached(MapKeyValueRepo(), koin.get())
         } else {
             basePostsMessages
         }

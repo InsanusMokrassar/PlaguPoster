@@ -24,6 +24,8 @@ import dev.inmo.tgbotapi.extensions.api.forwardMessage
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
+import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
+import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
@@ -150,9 +152,18 @@ object Plugin : Plugin {
                     }
                 )
 
-                val answer = waitMessageDataCallbackQuery().filter {
-                    it.message.sameMessage(message)
-                }.first()
+                val answer = oneOf(
+                    parallel {
+                        waitMessageDataCallbackQuery().filter {
+                            it.data == yesData
+                        }.first()
+                    },
+                    parallel {
+                        waitMessageDataCallbackQuery().filter {
+                            it.data == noData
+                        }.first()
+                    },
+                )
 
                 if (answer.data == yesData) {
                     if (recheckActor.trySend(Unit).isSuccess) {

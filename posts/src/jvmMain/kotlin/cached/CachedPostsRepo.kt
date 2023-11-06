@@ -1,10 +1,13 @@
 package dev.inmo.plaguposter.posts.cached
 
+import dev.inmo.micro_utils.coroutines.SmartRWLocker
 import korlibs.time.DateTime
 import dev.inmo.micro_utils.pagination.FirstPagePagination
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
 import dev.inmo.micro_utils.pagination.utils.doForAllWithNextPaging
 import dev.inmo.micro_utils.repos.CRUDRepo
+import dev.inmo.micro_utils.repos.KeyValueRepo
+import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
 import dev.inmo.micro_utils.repos.cache.full.FullCRUDCacheRepo
 import dev.inmo.plaguposter.posts.models.NewPost
@@ -20,12 +23,13 @@ import kotlinx.coroutines.flow.Flow
 class CachedPostsRepo(
     private val parentRepo: PostsRepo,
     private val scope: CoroutineScope,
-    private val kvCache: FullKVCache<PostId, RegisteredPost> = FullKVCache()
+    private val kvCache: KeyValueRepo<PostId, RegisteredPost> = MapKeyValueRepo()
 ) : PostsRepo, CRUDRepo<RegisteredPost, PostId, NewPost> by FullCRUDCacheRepo(
     parentRepo,
     kvCache,
     scope,
     skipStartInvalidate = false,
+    locker = SmartRWLocker(),
     { it.id }
 ) {
     override val removedPostsFlow: Flow<RegisteredPost> by parentRepo::removedPostsFlow

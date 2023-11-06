@@ -11,6 +11,9 @@ import dev.inmo.micro_utils.coroutines.actor
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.plugins.inline.queries.models.Format
+import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
+import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.NewPost
 import dev.inmo.plaguposter.posts.models.PostContentInfo
@@ -164,5 +167,14 @@ object Plugin : Plugin {
                 }
             }
         }
+        koin.getOrNull<InlineTemplatesRepo>() ?.addTemplate(
+            OfferTemplate(
+                "Force posts check",
+                listOf(
+                    Format("/force_garbage_collection")
+                ),
+                "Force check posts without exists messages"
+            )
+        )
     }
 }

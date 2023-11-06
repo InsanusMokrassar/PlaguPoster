@@ -23,6 +23,7 @@ import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.forwardMessage
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitInlineMessageIdDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.expectations.waitMessageDataCallbackQuery
 import dev.inmo.tgbotapi.extensions.behaviour_builder.oneOf
 import dev.inmo.tgbotapi.extensions.behaviour_builder.parallel
@@ -155,14 +156,14 @@ object Plugin : Plugin {
                 val answer = oneOf(
                     parallel {
                         waitMessageDataCallbackQuery().filter {
-                            it.data == yesData
+                            it.message.sameMessage(message)
                         }.first()
                     },
                     parallel {
-                        waitMessageDataCallbackQuery().filter {
-                            it.data == noData
+                        waitInlineMessageIdDataCallbackQuery().filter {
+                            it.data == yesData || it.data == noData
                         }.first()
-                    },
+                    }
                 )
 
                 if (answer.data == yesData) {

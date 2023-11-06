@@ -77,7 +77,7 @@ object Plugin : Plugin {
 
                     return@onCommand
                 }
-            } ?: selector ?.take(1) ?.firstOrNull()
+            } ?: selector ?.takeOneOrNull()
             if (postId == null) {
                 reply(
                     it,

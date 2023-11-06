@@ -51,7 +51,8 @@ object Plugin : Plugin {
     internal data class Config(
         @SerialName("krontab")
         val krontabTemplate: KrontabTemplate,
-        val dateTimeFormat: String = "HH:mm:ss, dd.MM.yyyy"
+        val dateTimeFormat: String = "HH:mm:ss, dd.MM.yyyy",
+        val retryOnPostFailureTimes: Int = 0
     ) {
         @Transient
         val krontab by lazy {
@@ -88,13 +89,27 @@ object Plugin : Plugin {
         }
 
         val krontab = koin.get<Config>().krontab
+        val retryOnPostFailureTimes = koin.get<Config>().retryOnPostFailureTimes
         val dateTimeFormat = koin.get<Config>().format
         krontab.asFlowWithDelays().subscribeSafelyWithoutExceptions(this) { dateTime ->
-            selector.take(now = dateTime).forEach { postId ->
-                if (filters.all { it.check(postId, dateTime) }) {
-                    publisher.publish(postId)
+            var leftRetries = retryOnPostFailureTimes
+            do {
+                val success = runCatching {
+                    selector.takeOneOrNull(now = dateTime) ?.let { postId ->
+                        if (filters.all { it.check(postId, dateTime) }) {
+                            publisher.publish(postId)
+                        } else {
+                            false
+                        }
+                    } ?: false
+                }.getOrElse {
+                    false
                 }
-            }
+                if (success) {
+                    break;
+                }
+                leftRetries--;
+            } while (leftRetries > 0)
         }
 
         suspend fun buildPage(pagination: Pagination = FirstPagePagination(size = pageCallbackDataQuerySize)): InlineKeyboardMarkup {
@@ -113,7 +128,7 @@ object Plugin : Plugin {
 
                 val selected = mutableListOf<PostId>()
                 krontab.asFlowWithoutDelays().take(pagination.lastIndexExclusive).collectIndexed { i, dateTime ->
-                    val postId = selector.take(now = dateTime, exclude = selected).firstOrNull() ?.also { postId ->
+                    val postId = selector.takeOneOrNull(now = dateTime, exclude = selected) ?.also { postId ->
                         if (filters.all { it.check(postId, dateTime) }) {
                             selected.add(postId)
                         } else {

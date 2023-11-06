@@ -65,7 +65,9 @@
     ]
   },
   "timer_trigger": {
-    "krontab": "0 30 2/4 * *"
+    "krontab": "0 30 2/4 * *",
+    "retryOnPostFailureTimes": 0,
+    "_note": "retryOnPostFailureTimes will retry to publish one or several posts if posting has been failed"
   },
   "panel": {
     "textPrefix": "Post management:",

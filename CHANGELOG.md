@@ -2,6 +2,9 @@
 
 ## 0.5.0
 
+* Dependencies update
+* Since this update bots will require **`JDK` 17+**
+
 ## 0.3.0
 
 * `Versions`:

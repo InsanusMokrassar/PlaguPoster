@@ -11,12 +11,14 @@ services:
       POSTGRES_DB: "test"
     volumes:
       - "./db/:/var/lib/postgresql/data"
+      - "/etc/timezone:/etc/timezone:ro"
   plaguposter:
     image: insanusmokrassar/plaguposter:latest
     container_name: "plaguposter"
     restart: "unless-stopped"
     volumes:
       - "./config.json:/config.json"
+      - "/etc/timezone:/etc/timezone:ro"
     depends_on:
       - "plaguposter_postgres"
     links:

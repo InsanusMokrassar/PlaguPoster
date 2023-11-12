@@ -1,5 +1,9 @@
 # PlaguPoster
 
+## 0.5.1
+
+* Add opportunity to set unique 
+
 ## 0.5.0
 
 * Dependencies update

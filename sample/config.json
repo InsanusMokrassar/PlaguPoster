@@ -51,7 +51,8 @@
           "to": "23:59"
         },
         "rating": {
-          "prefer": "max"
+          "prefer": "max",
+          "uniqueCount": 1
         }
       },
       {
@@ -60,7 +61,8 @@
           "to": "00:00"
         },
         "rating": {
-          "prefer": "max"
+          "prefer": "max",
+          "uniqueCount": 1
         }
       }
     ]

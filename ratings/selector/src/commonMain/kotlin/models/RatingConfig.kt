@@ -2,11 +2,9 @@ package dev.inmo.plaguposter.ratings.selector.models
 
 import korlibs.time.DateTime
 import korlibs.time.seconds
-import dev.inmo.micro_utils.pagination.FirstPagePagination
-import dev.inmo.micro_utils.pagination.Pagination
 import dev.inmo.micro_utils.pagination.utils.getAllByWithNextPaging
-import dev.inmo.micro_utils.repos.pagination.getAll
-import dev.inmo.plaguposter.common.DateTimeSerializer
+import dev.inmo.micro_utils.repos.KeyValueRepo
+import dev.inmo.micro_utils.repos.unset
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -25,17 +23,23 @@ data class RatingConfig(
     val max: Rating? = null,
     val prefer: Prefer = Prefer.Random,
     val otherwise: RatingConfig? = null,
-    val postAge: Seconds? = null
+    val postAge: Seconds? = null,
+    val uniqueCount: Int? = null
 ) {
     suspend fun select(
         ratingsRepo: RatingsRepo,
         postsRepo: PostsRepo,
         exclude: List<PostId>,
-        now: DateTime
+        now: DateTime,
+        latestChosenRepo: KeyValueRepo<PostId, DateTime>
     ): PostId? {
         var reversed: Boolean = false
         var count: Int? = null
         val allowedCreationTime = now - (postAge ?: 0).seconds
+        val excludedByRepo = uniqueCount ?.let {
+            latestChosenRepo.getAll().toList().sortedBy { it.second }.takeLast(uniqueCount).map { it.first }
+        } ?: emptyList()
+        val resultExcluded = exclude + excludedByRepo
 
         when (prefer) {
             Prefer.Max -> {
@@ -59,40 +63,53 @@ data class RatingConfig(
                         ratingsRepo.getAllByWithNextPaging { keys(it) }
                     }
                     else -> {
-                        ratingsRepo.getPostsWithRatingLessEq(max, exclude = exclude).keys
+                        ratingsRepo.getPostsWithRatingLessEq(max, exclude = resultExcluded).keys
                     }
                 }
             }
             else -> {
                 when (max) {
                     null -> {
-                        ratingsRepo.getPostsWithRatingGreaterEq(min, exclude = exclude).keys
+                        ratingsRepo.getPostsWithRatingGreaterEq(min, exclude = resultExcluded).keys
                     }
                     else -> {
-                        ratingsRepo.getPosts(min .. max, reversed, count, exclude = exclude).keys
+                        ratingsRepo.getPosts(min .. max, reversed, count, exclude = resultExcluded).keys
                     }
                 }
             }
         }.filter {
-            it !in exclude && (postsRepo.getPostCreationTime(it) ?.let { it < allowedCreationTime } ?: true)
+            it !in resultExcluded && (postsRepo.getPostCreationTime(it) ?.let { it < allowedCreationTime } ?: true)
         }
 
-        return when (prefer) {
+        val resultPosts: PostId = when (prefer) {
             Prefer.Max,
             Prefer.Min -> posts.firstOrNull()
             Prefer.Random -> posts.randomOrNull()
-        } ?: otherwise ?.select(ratingsRepo, postsRepo, exclude, now)
+        } ?: otherwise ?.select(ratingsRepo, postsRepo, resultExcluded, now, latestChosenRepo) ?: return null
+
+        val postsToKeep = uniqueCount ?.let {
+            (excludedByRepo + resultPosts).takeLast(it)
+        } ?: return resultPosts
+
+        val postsToRemoveFromKeep = excludedByRepo.filter { it !in postsToKeep }
+        latestChosenRepo.unset(postsToRemoveFromKeep)
+        val postsToAdd = postsToKeep.filter { it !in excludedByRepo }
+        latestChosenRepo.set(
+            postsToAdd.associateWith { DateTime.now() }
+        )
+
+        return resultPosts
     }
 
     @Serializable(Prefer.Serializer::class)
     sealed interface Prefer {
         val type: String
         @Serializable(Serializer::class)
-        object Max : Prefer { override val type: String = "max" }
+        data object Max : Prefer { override val type: String = "max" }
         @Serializable(Serializer::class)
-        object Min : Prefer { override val type: String = "min" }
+        data object Min : Prefer { override val type: String = "min" }
         @Serializable(Serializer::class)
-        object Random : Prefer { override val type: String = "random" }
+        data object Random : Prefer { override val type: String = "random" }
 
         object Serializer : KSerializer<Prefer> {
             override val descriptor: SerialDescriptor = String.serializer().descriptor

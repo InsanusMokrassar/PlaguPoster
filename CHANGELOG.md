@@ -1,5 +1,7 @@
 # PlaguPoster
 
+## 0.5.2
+
 ## 0.5.1
 
 * Add opportunity to set unique 

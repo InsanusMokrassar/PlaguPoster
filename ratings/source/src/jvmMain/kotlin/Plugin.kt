@@ -242,7 +242,7 @@ object Plugin : Plugin {
             }
         }
         onCommand("ratings", requireOnlyCommandInMessage = true) {
-            if (it.chat.id == chatConfig.sourceChatId) {
+            if (it.chat.id in chatConfig.allSourceChatIds) {
                 val ratings = ratingsRepo.postsByRatings().toList().sortedByDescending { it.first }
                 val textSources = buildEntities {
                     + "Ratings amount: " + bold("${ratings.sumOf { it.second.size }}") + "\n\n"
@@ -260,8 +260,8 @@ object Plugin : Plugin {
                 }
             }
         }
-        includeRootNavigationButtonsHandler(setOf(chatConfig.sourceChatId), ratingsRepo, postsRepo)
-        onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id == chatConfig.sourceChatId }) {
+        includeRootNavigationButtonsHandler(chatConfig.allSourceChatIds, ratingsRepo, postsRepo)
+        onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id in chatConfig.allSourceChatIds }) {
             edit(
                 it.message,
                 ratingsRepo.buildRootButtons()

@@ -12,15 +12,20 @@ data class ChatConfig(
     val targetChatId: IdChatIdentifier? = null,
     @SerialName("sourceChat")
     @Serializable(FullChatIdentifierSerializer::class)
-    val sourceChatId: IdChatIdentifier,
+    val sourceChatId: IdChatIdentifier?,
     @SerialName("cacheChat")
     @Serializable(FullChatIdentifierSerializer::class)
     val cacheChatId: IdChatIdentifier,
     @SerialName("targetChats")
     val targetChatIds: List<@Serializable(FullChatIdentifierSerializer::class) IdChatIdentifier> = emptyList(),
+    @SerialName("sourceChats")
+    val sourceChatIds: List<@Serializable(FullChatIdentifierSerializer::class) IdChatIdentifier> = emptyList(),
 ) {
     val allTargetChatIds by lazy {
-        listOfNotNull(targetChatId) + targetChatIds
+        (listOfNotNull(targetChatId) + targetChatIds).toSet()
+    }
+    val allSourceChatIds by lazy {
+        (listOfNotNull(sourceChatId) + sourceChatIds).toSet()
     }
 
     init {
@@ -30,8 +35,8 @@ data class ChatConfig(
     }
 
     fun check(chatId: IdChatIdentifier) = when (chatId) {
-        targetChatId,
-        sourceChatId,
+        in allTargetChatIds,
+        in allSourceChatIds,
         cacheChatId -> true
         else -> false
     }

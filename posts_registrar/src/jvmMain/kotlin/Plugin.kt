@@ -119,12 +119,12 @@ object Plugin : Plugin {
             null
         }
 
-        onCommand("start_post", initialFilter = { it.sameChat(config.sourceChatId) }) {
+        onCommand("start_post", initialFilter = { config.allSourceChatIds.any { chatId -> it.sameChat(chatId) } }) {
             startChain(RegistrationState.InProcess(it.chat.id, emptyList()))
         }
 
         onContentMessage(
-            initialFilter = { it.sameChat(config.sourceChatId) && !FirstSourceIsCommandsFilter(it) }
+            initialFilter = { config.allSourceChatIds.any { chatId -> it.sameChat(chatId) } && !FirstSourceIsCommandsFilter(it) }
         ) {
             startChain(RegistrationState.Finish(it.chat.id, PostContentInfo.fromMessage(it)))
         }

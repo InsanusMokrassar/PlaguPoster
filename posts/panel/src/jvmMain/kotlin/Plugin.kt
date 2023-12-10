@@ -146,7 +146,7 @@ object Plugin : Plugin {
 
         onMessageDataCallbackQuery (
             initialFilter = {
-                it.data.startsWith(PanelButtonsAPI.openGlobalMenuDataPrefix) && it.message.chat.id == chatsConfig.sourceChatId
+                it.data.startsWith(PanelButtonsAPI.openGlobalMenuDataPrefix) && it.message.chat.id in chatsConfig.allSourceChatIds
             }
         ) {
             val postId = it.data.removePrefix(PanelButtonsAPI.openGlobalMenuDataPrefix).let(::PostId)
@@ -155,7 +155,7 @@ object Plugin : Plugin {
         }
         onMessageDataCallbackQuery(
             initialFilter = {
-                it.data.startsWith("delete ") && it.message.chat.id == chatsConfig.sourceChatId
+                it.data.startsWith("delete ") && it.message.chat.id in chatsConfig.allSourceChatIds
             }
         ) { query ->
             val postId = query.data.removePrefix("delete ").let(::PostId)
@@ -182,7 +182,7 @@ object Plugin : Plugin {
         }
         onMessageDataCallbackQuery(
             initialFilter = {
-                it.data.startsWith("refresh ") && it.message.chat.id == chatsConfig.sourceChatId
+                it.data.startsWith("refresh ") && it.message.chat.id in chatsConfig.allSourceChatIds
             }
         ) { query ->
             val postId = query.data.removePrefix("refresh ").let(::PostId)

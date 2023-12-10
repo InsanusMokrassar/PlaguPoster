@@ -104,10 +104,12 @@ object Plugin : Plugin {
                 return@forEach
             }
 
-            send(
-                chatsConfig.sourceChatId,
-                "Can't find any messages for post $postId. So, deleting it"
-            )
+            runCatching {
+                send(
+                    chatsConfig.cacheChatId,
+                    "Can't find any messages for post $postId. So, deleting it"
+                )
+            }
             runCatching {
                 postsRepo.deleteById(postId)
             }

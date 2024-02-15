@@ -31,6 +31,7 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
 import dev.inmo.tgbotapi.types.message.ParseMode
@@ -112,7 +113,7 @@ object Plugin : Plugin {
                 firstContent.chatId,
                 text = config.text,
                 parseMode = config.parseMode,
-                replyToMessageId = firstContent.messageId,
+                replyParameters = ReplyParameters(firstContent.chatId, firstContent.messageId),
                 replyMarkup = InlineKeyboardMarkup(buttons),
                 disableNotification = true
             ).also { sentMessage ->

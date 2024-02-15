@@ -37,6 +37,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
@@ -129,7 +130,7 @@ object Plugin : Plugin {
                         content.chatId,
                         config.ratingOfferText,
                         config.variants.keys.toList(),
-                        replyToMessageId = content.messageId
+                        replyParameters = ReplyParameters(content.chatId, content.messageId)
                     )
                     pollsToPostsIdsRepo.set(sent.content.poll.id, postId)
                     pollsToMessageInfoRepo.set(sent.content.poll.id, sent.short())

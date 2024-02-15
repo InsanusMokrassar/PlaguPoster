@@ -1,14 +1,14 @@
 [versions]
 
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 kotlin-serialization = "1.6.2"
 
-plagubot = "7.4.1"
-tgbotapi = "9.4.2"
-microutils = "0.20.19"
-kslog = "1.3.1"
-krontab = "2.2.4"
-plagubot-plugins = "0.17.1"
+plagubot = "8.1.1"
+tgbotapi = "10.0.1"
+microutils = "0.20.34"
+kslog = "1.3.2"
+krontab = "2.2.7"
+plagubot-plugins = "0.18.1"
 
 dokka = "1.9.10"
 

@@ -151,7 +151,7 @@ object Plugin : Plugin {
             }
         }
 
-        onCommand("autoschedule_panel", initialFilter = { it.sameChat(chatConfig.sourceChatId) }) {
+        onCommand("autoschedule_panel", initialFilter = { chatConfig.allSourceChatIds.any { chatId -> it.sameChat(chatId) } }) {
             val keyboard = buildPage()
 
             runCatchingSafely {
@@ -167,7 +167,7 @@ object Plugin : Plugin {
 
         onMessageDataCallbackQuery(
             Regex("^$pageCallbackDataQueryPrefix\\d+"),
-            initialFilter = { it.message.sameChat(chatConfig.sourceChatId) }
+            initialFilter = { chatConfig.allSourceChatIds.any { sourceChatId -> it.message.sameChat(sourceChatId) } }
         ) {
             val page = it.data.removePrefix(pageCallbackDataQueryPrefix).toIntOrNull() ?: let { _ ->
                 answer(it)

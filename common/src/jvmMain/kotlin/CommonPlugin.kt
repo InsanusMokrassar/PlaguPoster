@@ -27,7 +27,7 @@ object CommonPlugin : Plugin {
         val config = koin.get<ChatConfig>()
 
         Log.iS { "Target chats info: ${config.allTargetChatIds.map { getChat(it) }.joinToString()}" }
-        Log.iS { "Source chat info: ${getChat(config.sourceChatId)}" }
+        Log.iS { "Source chats info: ${config.allSourceChatIds.map { getChat(it) }.joinToString()}" }
         Log.iS { "Cache chat info: ${getChat(config.cacheChatId)}" }
     }
 }

@@ -37,6 +37,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
+import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
@@ -129,7 +130,7 @@ object Plugin : Plugin {
                         content.chatId,
                         config.ratingOfferText,
                         config.variants.keys.toList(),
-                        replyToMessageId = content.messageId
+                        replyParameters = ReplyParameters(content.chatId, content.messageId)
                     )
                     pollsToPostsIdsRepo.set(sent.content.poll.id, postId)
                     pollsToMessageInfoRepo.set(sent.content.poll.id, sent.short())
@@ -242,7 +243,7 @@ object Plugin : Plugin {
             }
         }
         onCommand("ratings", requireOnlyCommandInMessage = true) {
-            if (it.chat.id == chatConfig.sourceChatId) {
+            if (it.chat.id in chatConfig.allSourceChatIds) {
                 val ratings = ratingsRepo.postsByRatings().toList().sortedByDescending { it.first }
                 val textSources = buildEntities {
                     + "Ratings amount: " + bold("${ratings.sumOf { it.second.size }}") + "\n\n"
@@ -260,8 +261,8 @@ object Plugin : Plugin {
                 }
             }
         }
-        includeRootNavigationButtonsHandler(setOf(chatConfig.sourceChatId), ratingsRepo, postsRepo)
-        onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id == chatConfig.sourceChatId }) {
+        includeRootNavigationButtonsHandler(chatConfig.allSourceChatIds, ratingsRepo, postsRepo)
+        onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id in chatConfig.allSourceChatIds }) {
             edit(
                 it.message,
                 ratingsRepo.buildRootButtons()

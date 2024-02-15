@@ -58,7 +58,7 @@ object Plugin : Plugin {
         }
         single {
             val config = get<Config>()
-            PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.allTargetChatIds, config.deleteAfterPublishing)
+            PostPublisher(get(), get(), config.chats.cacheChatId, config.chats.allTargetChatIds.toList(), config.deleteAfterPublishing)
         }
     }
 

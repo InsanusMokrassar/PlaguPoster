@@ -16,7 +16,7 @@ import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.models.RegisteredPost
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.MessageId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -34,7 +34,7 @@ class CachedPostsRepo(
 ) {
     override val removedPostsFlow: Flow<RegisteredPost> by parentRepo::removedPostsFlow
 
-    override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageIdentifier): PostId? {
+    override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageId): PostId? {
         doForAllWithNextPaging(firstPageWithOneElementPagination) {
             kvCache.values(it).also {
                 it.results.forEach {

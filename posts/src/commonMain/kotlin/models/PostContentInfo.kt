@@ -1,10 +1,7 @@
 package dev.inmo.plaguposter.posts.models
 
 import dev.inmo.tgbotapi.extensions.utils.possiblyMediaGroupMessageOrNull
-import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.*
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.MediaGroupContent
 import kotlinx.serialization.Serializable
@@ -13,8 +10,8 @@ import kotlinx.serialization.Serializable
 data class PostContentInfo(
     @Serializable(FullChatIdentifierSerializer::class)
     val chatId: IdChatIdentifier,
-    val messageId: MessageIdentifier,
-    val group: String?,
+    val messageId: MessageId,
+    val group: MediaGroupId?,
     val order: Int
 ) {
     companion object {

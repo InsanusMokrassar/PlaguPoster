@@ -49,7 +49,7 @@ class ExposedRatingsRepo (
         count: Int?,
         exclude: List<PostId>
     ): Map<PostId, Rating> = transaction(database) {
-        select {
+        selectAll().where {
             ratingsColumn.greaterEq(range.start.double).and(
                 ratingsColumn.lessEq(range.endInclusive.double)
             ).and(
@@ -66,7 +66,7 @@ class ExposedRatingsRepo (
         count: Int?,
         exclude: List<PostId>
     ) = transaction(database) {
-        select { ratingsColumn.greaterEq(then.double).and(keyColumn.notInList(exclude.map { it.string })) }.optionallyLimit(count).optionallyReverse(reversed).map {
+        selectAll().where { ratingsColumn.greaterEq(then.double).and(keyColumn.notInList(exclude.map { it.string })) }.optionallyLimit(count).optionallyReverse(reversed).map {
             it.asKey to it.asObject
         }
     }.toMap()
@@ -77,7 +77,7 @@ class ExposedRatingsRepo (
         count: Int?,
         exclude: List<PostId>
     ): Map<PostId, Rating> = transaction(database) {
-        select { ratingsColumn.lessEq(then.double).and(keyColumn.notInList(exclude.map { it.string })) }.optionallyLimit(count).optionallyReverse(reversed).map {
+        selectAll().where { ratingsColumn.lessEq(then.double).and(keyColumn.notInList(exclude.map { it.string })) }.optionallyLimit(count).optionallyReverse(reversed).map {
             it.asKey to it.asObject
         }
     }.toMap()

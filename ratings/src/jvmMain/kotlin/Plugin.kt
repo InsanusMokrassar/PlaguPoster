@@ -5,7 +5,6 @@ import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.micro_utils.repos.unset
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plaguposter.common.useCache
-import dev.inmo.plaguposter.posts.exposed.ExposedPostsRepo
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.exposed.ExposedRatingsRepo
 import dev.inmo.plaguposter.ratings.repo.*
@@ -14,7 +13,6 @@ import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
-import org.koin.dsl.binds
 
 object Plugin : Plugin {
     override fun Module.setupDI(database: Database, params: JsonObject) {

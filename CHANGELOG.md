@@ -1,5 +1,9 @@
 # PlaguPoster
 
+## 0.5.5
+
+* Dependencies update
+
 ## 0.5.4
 
 * Dependencies update

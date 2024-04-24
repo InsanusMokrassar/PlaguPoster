@@ -4,21 +4,18 @@ import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.micro_utils.repos.exposed.keyvalue.ExposedKeyValueRepo
 import dev.inmo.micro_utils.repos.mappers.withMapper
 import dev.inmo.plaguposter.posts.models.PostId
-import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.FullChatIdentifierSerializer
-import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.*
 import kotlinx.serialization.builtins.PairSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.Database
 
-private val ChatIdToMessageSerializer = PairSerializer(FullChatIdentifierSerializer, MessageIdentifier.serializer())
+private val ChatIdToMessageSerializer = PairSerializer(FullChatIdentifierSerializer, MessageId.serializer())
 
 fun PostsMessages(
     database: Database,
     json: Json
-): KeyValueRepo<PostId, Pair<IdChatIdentifier, MessageIdentifier>> = ExposedKeyValueRepo<String, String>(
+): KeyValueRepo<PostId, Pair<IdChatIdentifier, MessageId>> = ExposedKeyValueRepo<String, String>(
     database,
     { text("postId") },
     { text("chatToMessage") },

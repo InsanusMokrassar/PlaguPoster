@@ -10,7 +10,7 @@ import dev.inmo.plaguposter.posts.models.*
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.IdChatIdentifier
-import dev.inmo.tgbotapi.types.MessageIdentifier
+import dev.inmo.tgbotapi.types.MessageId
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.*
@@ -93,10 +93,10 @@ class ExposedPostsRepo(
                 post.content.forEach { contentInfo ->
                     insert {
                         it[postIdColumn] = post.id.string
-                        it[chatIdColumn] = contentInfo.chatId.chatId
-                        it[threadIdColumn] = contentInfo.chatId.threadId
-                        it[messageIdColumn] = contentInfo.messageId
-                        it[groupColumn] = contentInfo.group
+                        it[chatIdColumn] = contentInfo.chatId.chatId.long
+                        it[threadIdColumn] = contentInfo.chatId.threadId ?.long
+                        it[messageIdColumn] = contentInfo.messageId.long
+                        it[groupColumn] = contentInfo.group ?.string
                         it[orderColumn] = contentInfo.order
                     }
                 }
@@ -153,13 +153,13 @@ class ExposedPostsRepo(
         }
     }
 
-    override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageIdentifier): PostId? {
+    override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageId): PostId? {
         return transaction(database) {
             with(contentRepo) {
                 select {
-                    chatIdColumn.eq(chatId.chatId)
-                        .and(chatId.threadId ?.let { threadIdColumn.eq(it) } ?: threadIdColumn.isNull())
-                        .and(messageIdColumn.eq(messageId))
+                    chatIdColumn.eq(chatId.chatId.long)
+                        .and(chatId.threadId ?.let { threadIdColumn.eq(it.long) } ?: threadIdColumn.isNull())
+                        .and(messageIdColumn.eq(messageId.long))
                 }.limit(1).firstOrNull() ?.get(postIdColumn)
             } ?.let(::PostId)
         }

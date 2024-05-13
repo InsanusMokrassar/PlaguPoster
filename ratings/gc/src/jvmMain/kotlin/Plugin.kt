@@ -5,6 +5,8 @@ import korlibs.time.seconds
 import dev.inmo.krontab.KrontabTemplate
 import dev.inmo.krontab.toSchedule
 import dev.inmo.krontab.utils.asFlowWithDelays
+import dev.inmo.kslog.common.KSLog
+import dev.inmo.kslog.common.i
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.singleWithRandomQualifier
@@ -64,14 +66,21 @@ object Plugin : Plugin {
             }
         }
         config.autoclear ?.let { autoclear ->
+            val autoClearLogger = KSLog("autoclear")
             suspend fun doAutoClear() {
+                autoClearLogger.i { "Start autoclear" }
                 val dropCreatedBefore = DateTime.now() - (autoclear.skipPostAge ?: 0).seconds
-                ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.forEach {
+                autoClearLogger.i { "Posts drop created before: ${dropCreatedBefore.toStringDefault()}" }
+                val idsToDelete = ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.filter {
                     val postCreationDateTime = postsRepo.getPostCreationTime(it) ?: (dropCreatedBefore - 1.seconds) // do dropping if post creation time is not available
-                    if (postCreationDateTime < dropCreatedBefore) {
-                        ratingsRepo.unset(it)
-                        postsRepo.deleteById(it)
-                    }
+                    postCreationDateTime < dropCreatedBefore
+                }
+                autoClearLogger.i { "Posts to drop: $idsToDelete" }
+                if (idsToDelete.isNotEmpty()) {
+                    runCatching { ratingsRepo.unset(idsToDelete) }
+                    autoClearLogger.i { "Ratings dropped" }
+                    runCatching { postsRepo.deleteById(idsToDelete) }
+                    autoClearLogger.i { "Posts dropped" }
                 }
             }
             runCatchingSafely {

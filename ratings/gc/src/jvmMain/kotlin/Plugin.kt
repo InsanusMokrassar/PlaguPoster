@@ -62,7 +62,9 @@ object Plugin : Plugin {
             suspend fun doAutoClear() {
                 val dropCreatedBefore = DateTime.now() - (autoclear.skipPostAge ?: 0).seconds
                 ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.forEach {
-                    if ((postsRepo.getPostCreationTime(it) ?: return@forEach) < dropCreatedBefore) {
+                    val postCreationDateTime = postsRepo.getPostCreationTime(it) ?: (dropCreatedBefore - 1.seconds) // do dropping if post creation time is not available
+                    if (postCreationDateTime < dropCreatedBefore) {
+                        ratingsRepo.unset(it)
                         postsRepo.deleteById(it)
                     }
                 }

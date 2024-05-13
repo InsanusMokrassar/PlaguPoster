@@ -1,6 +1,8 @@
 package dev.inmo.plaguposter.ratings.repo
 
 import dev.inmo.micro_utils.pagination.utils.doForAllWithNextPaging
+import dev.inmo.micro_utils.pagination.utils.optionallyReverse
+import dev.inmo.micro_utils.pagination.utils.paginate
 import dev.inmo.micro_utils.repos.KeyValueRepo
 import dev.inmo.micro_utils.repos.MapKeyValueRepo
 import dev.inmo.micro_utils.repos.cache.full.FullKeyValueCacheRepo
@@ -19,20 +21,16 @@ class CachedRatingsRepo(
         count: Int?,
         exclude: List<PostId>
     ): Map<PostId, Rating> {
-        val result = mutableMapOf<PostId, Rating>()
-
-        doForAllWithNextPaging {
-            kvCache.keys(it).also {
-                it.results.forEach {
-                    val rating = get(it) ?: return@forEach
-                    if (it !in exclude && rating in range) {
-                        result[it] = rating
-                    }
-                }
+        return kvCache.getAll().filter { (it, rating) ->
+            it !in exclude && rating in range
+        }.let {
+            if (count == null) {
+                it
+            } else {
+                val keys = it.keys.optionallyReverse(reversed).take(count)
+                keys.associateWith { id -> it.getValue(id) }
             }
         }
-
-        return result.toMap()
     }
 
     override suspend fun getPostsWithRatingGreaterEq(

@@ -71,11 +71,13 @@ object Plugin : Plugin {
                 autoClearLogger.i { "Start autoclear" }
                 val dropCreatedBefore = DateTime.now() - (autoclear.skipPostAge ?: 0).seconds
                 autoClearLogger.i { "Posts drop created before: ${dropCreatedBefore.toStringDefault()}" }
-                val idsToDelete = ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.filter {
+                val idsToDelete = ratingsRepo.getPostsWithRatingLessEq(autoclear.rating).keys.also {
+                    autoClearLogger.i { "Selected posts by rating: $it" }
+                }.filter {
                     val postCreationDateTime = postsRepo.getPostCreationTime(it) ?: (dropCreatedBefore - 1.seconds) // do dropping if post creation time is not available
                     postCreationDateTime < dropCreatedBefore
                 }
-                autoClearLogger.i { "Posts to drop: $idsToDelete" }
+                autoClearLogger.i { "Filtered posts by datetime: $idsToDelete" }
                 if (idsToDelete.isNotEmpty()) {
                     runCatching { ratingsRepo.unset(idsToDelete) }
                     autoClearLogger.i { "Ratings dropped" }

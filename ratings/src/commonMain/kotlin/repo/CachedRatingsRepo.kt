@@ -15,14 +15,14 @@ class CachedRatingsRepo(
     private val scope: CoroutineScope,
     private val kvCache: MapKeyValueRepo<PostId, Rating> = MapKeyValueRepo()
 ) : RatingsRepo, KeyValueRepo<PostId, Rating> by FullKeyValueCacheRepo(base, kvCache, scope) {
-    override suspend fun getPosts(
-        range: ClosedRange<Rating>,
+    private suspend fun getPosts(
         reversed: Boolean,
         count: Int?,
-        exclude: List<PostId>
+        exclude: List<PostId>,
+        ratingFilter: (Rating) -> Boolean
     ): Map<PostId, Rating> {
         return kvCache.getAll().filter { (it, rating) ->
-            it !in exclude && rating in range
+            it !in exclude && ratingFilter(rating)
         }.let {
             if (count == null) {
                 it
@@ -32,28 +32,30 @@ class CachedRatingsRepo(
             }
         }
     }
+    override suspend fun getPosts(
+        range: ClosedRange<Rating>,
+        reversed: Boolean,
+        count: Int?,
+        exclude: List<PostId>
+    ): Map<PostId, Rating> = getPosts(reversed, count, exclude) {
+        it in range
+    }
 
     override suspend fun getPostsWithRatingGreaterEq(
         then: Rating,
         reversed: Boolean,
         count: Int?,
         exclude: List<PostId>
-    ): Map<PostId, Rating> = getPosts(
-        then .. Rating(Double.MAX_VALUE),
-        reversed,
-        count,
-        exclude
-    )
+    ): Map<PostId, Rating> = getPosts(reversed, count, exclude) {
+        it >= then
+    }
 
     override suspend fun getPostsWithRatingLessEq(
         then: Rating,
         reversed: Boolean,
         count: Int?,
         exclude: List<PostId>
-    ): Map<PostId, Rating> = getPosts(
-        Rating(Double.MIN_VALUE) .. then,
-        reversed,
-        count,
-        exclude
-    )
+    ): Map<PostId, Rating> = getPosts(reversed, count, exclude) {
+        it <= then
+    }
 }

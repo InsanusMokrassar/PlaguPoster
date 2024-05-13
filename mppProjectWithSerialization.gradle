@@ -4,7 +4,13 @@ project.group = "$group"
 apply from: "$publishGradlePath"
 
 kotlin {
-    jvm()
+    jvm {
+        compilations.main {
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+    }
     js (IR) {
         browser()
         nodejs()
@@ -36,5 +42,10 @@ kotlin {
         }
 
     }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 

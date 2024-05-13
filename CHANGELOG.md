@@ -1,5 +1,11 @@
 # PlaguPoster
 
+## 0.5.6
+
+* `Ratings`:
+    * `GC`:
+        * Now GC will autoclear ratings even if post is absent in posts repo
+
 ## 0.5.5
 
 * Dependencies update

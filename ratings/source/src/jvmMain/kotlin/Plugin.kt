@@ -28,6 +28,7 @@ import dev.inmo.plaguposter.ratings.utils.postsByRatings
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.delete
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.polls.sendRegularPoll
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.api.send.send
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
@@ -41,7 +42,10 @@ import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.message.textsources.bold
 import dev.inmo.tgbotapi.types.message.textsources.regular
+import dev.inmo.tgbotapi.types.polls.InputPollOption
+import dev.inmo.tgbotapi.types.polls.PollOption
 import dev.inmo.tgbotapi.utils.buildEntities
+import dev.inmo.tgbotapi.utils.extensions.makeSourceString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
@@ -112,7 +116,7 @@ object Plugin : Plugin {
         onPollUpdates (markerFactory = { it.id }) { poll ->
             val postId = pollsToPostsIdsRepo.get(poll.id) ?: return@onPollUpdates
             val newRating = poll.options.sumOf {
-                (variantsTransformer(it.text) ?.double ?.times(it.votes)) ?: 0.0
+                (variantsTransformer(it.textSources.makeSourceString()) ?.double ?.times(it.votes)) ?: 0.0
             }
             ratingsRepo.set(postId, Rating(newRating))
         }
@@ -129,7 +133,9 @@ object Plugin : Plugin {
                     val sent = send(
                         content.chatId,
                         config.ratingOfferText,
-                        config.variants.keys.toList(),
+                        options = config.variants.map {
+                            InputPollOption(it.key)
+                        },
                         replyParameters = ReplyParameters(content.chatId, content.messageId)
                     )
                     pollsToPostsIdsRepo.set(sent.content.poll.id, postId)
@@ -265,7 +271,7 @@ object Plugin : Plugin {
         onMessageDataCallbackQuery("ratings_interactive", initialFilter = { it.message.chat.id in chatConfig.allSourceChatIds }) {
             edit(
                 it.message,
-                ratingsRepo.buildRootButtons()
+                replyMarkup = ratingsRepo.buildRootButtons()
             )
         }
 

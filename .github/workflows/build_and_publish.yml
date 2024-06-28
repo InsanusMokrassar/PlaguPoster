@@ -14,6 +14,7 @@ jobs:
           java-version: 17
       - name: Rewrite version
         run: |
+          printf "\norg.gradle.jvmargs=-Xmx1g -Xms500m\nkotlin.daemon.jvmargs=-Xmx1g -Xms500m\norg.gradle.daemon=false" >> gradle.properties
           branch="`echo "${{ github.ref }}" | grep -o "[^/]*$"`"
           cat gradle.properties | sed -e "s/^version=\([0-9\.]*\)/version=\1-branch_$branch-build${{ github.run_number }}/" > gradle.properties.tmp
           rm gradle.properties

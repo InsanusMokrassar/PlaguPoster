@@ -122,7 +122,7 @@ suspend fun BehaviourContext.includeRootNavigationButtonsHandler(
 
                     edit(
                         it.message,
-                        onPageUpdate(SimplePagination(page, size), args.drop(3).toTypedArray()) ?: return@runCatchingSafely
+                        replyMarkup = onPageUpdate(SimplePagination(page, size), args.drop(3).toTypedArray()) ?: return@runCatchingSafely
                     )
                 }
 
@@ -155,7 +155,7 @@ suspend fun BehaviourContext.includeRootNavigationButtonsHandler(
         if (prefix == RootButtonsShowRatingData) {
             runCatchingSafely {
                 val rating = ratingRaw.toDoubleOrNull() ?: return@runCatchingSafely
-                edit(it.message, ratingsRepo.buildRatingButtons(postsRepo, Rating(rating)))
+                edit(it.message, replyMarkup = ratingsRepo.buildRatingButtons(postsRepo, Rating(rating)))
             }
 
             answer(it)

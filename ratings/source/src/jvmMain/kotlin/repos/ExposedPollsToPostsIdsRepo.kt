@@ -27,7 +27,7 @@ class ExposedPollsToPostsIdsRepo(
         it[postIdColumn] = v.string
     }
 
-    override fun insertKey(k: PollId, v: PostId, it: InsertStatement<Number>) {
+    override fun insertKey(k: PollId, v: PostId, it: UpdateBuilder<Int>) {
         it[keyColumn] = k.string
     }
 }

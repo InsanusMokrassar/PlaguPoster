@@ -48,7 +48,7 @@ class ExposedPostsRepo(
                 id,
                 DateTime(get(createdColumn)),
                 with(contentRepo) {
-                    select { postIdColumn.eq(id.string) }.map {
+                    selectAll().where { postIdColumn.eq(id.string) }.map {
                         it.asObject
                     }
                 }
@@ -69,14 +69,14 @@ class ExposedPostsRepo(
             id,
             DateTime(get(createdColumn)),
             with(contentRepo) {
-                select { postIdColumn.eq(id.string) }.map {
+                selectAll().where { postIdColumn.eq(id.string) }.map {
                     it.asObject
                 }
             }
         )
     }
 
-    override fun createAndInsertId(value: NewPost, it: InsertStatement<Number>): PostId {
+    override fun createAndInsertId(value: NewPost, it: UpdateBuilder<Int>): PostId {
         val id = PostId(uuid4().toString())
         it[idColumn] = id.string
         return id
@@ -104,7 +104,7 @@ class ExposedPostsRepo(
         }
     }
 
-    override fun insert(value: NewPost, it: InsertStatement<Number>) {
+    override fun insert(value: NewPost, it: UpdateBuilder<Int>) {
         super.insert(value, it)
         it[createdColumn] = DateTime.now().unixMillis
     }
@@ -144,7 +144,7 @@ class ExposedPostsRepo(
                 existsIds
             } else {
                 existsIds.filter {
-                    select { selectById(it) }.limit(1).none()
+                    selectAll().where { selectById(it) }.limit(1).none()
                 }
             }
         }.forEach {
@@ -156,7 +156,7 @@ class ExposedPostsRepo(
     override suspend fun getIdByChatAndMessage(chatId: IdChatIdentifier, messageId: MessageId): PostId? {
         return transaction(database) {
             with(contentRepo) {
-                select {
+                selectAll().where {
                     chatIdColumn.eq(chatId.chatId.long)
                         .and(chatId.threadId ?.let { threadIdColumn.eq(it.long) } ?: threadIdColumn.isNull())
                         .and(messageIdColumn.eq(messageId.long))
@@ -166,12 +166,12 @@ class ExposedPostsRepo(
     }
 
     override suspend fun getPostCreationTime(postId: PostId): DateTime? = transaction(database) {
-        select { selectById(postId) }.limit(1).firstOrNull() ?.get(createdColumn) ?.let(::DateTime)
+        selectAll().where { selectById(postId) }.limit(1).firstOrNull() ?.get(createdColumn) ?.let(::DateTime)
     }
 
     override suspend fun getFirstMessageInfo(postId: PostId): PostContentInfo? = transaction(database) {
         with(contentRepo) {
-            select { postIdColumn.eq(postId.string) }.limit(1).firstOrNull() ?.asObject
+            selectAll().where { postIdColumn.eq(postId.string) }.limit(1).firstOrNull() ?.asObject
         }
     }
 }

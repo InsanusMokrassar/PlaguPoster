@@ -4,7 +4,7 @@ plugins {
 
 }
 
-apply from: "$mppProjectWithSerializationPresetPath"
+apply from: "$mppJavaProjectPresetPath"
 
 kotlin {
     sourceSets {

@@ -3,7 +3,7 @@ plugins {
     id "org.jetbrains.kotlin.plugin.serialization"
 }
 
-apply from: "$mppProjectWithSerializationPresetPath"
+apply from: "$mppJavaProjectPresetPath"
 
 kotlin {
     sourceSets {

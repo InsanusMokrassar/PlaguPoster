@@ -37,7 +37,6 @@ kotlin {
         jsTest {
             dependencies {
                 implementation libs.kotlin.test.js
-                implementation libs.kotlin.test.junit
             }
         }
 

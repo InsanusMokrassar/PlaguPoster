@@ -44,7 +44,7 @@ class ExposedPollsToMessagesInfoRepo(
         it[messageIdColumn] = v.messageId.long
     }
 
-    override fun insertKey(k: PollId, v: ShortMessageInfo, it: InsertStatement<Number>) {
+    override fun insertKey(k: PollId, v: ShortMessageInfo, it: UpdateBuilder<Int>) {
         it[keyColumn] = k.string
     }
 }

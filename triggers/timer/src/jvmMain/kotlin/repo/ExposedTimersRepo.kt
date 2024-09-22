@@ -50,7 +50,7 @@ class ExposedTimersRepo(
         it[dateTimeColumn] = v.unixMillisLong
     }
 
-    override fun insertKey(k: PostId, v: DateTime, it: InsertStatement<Number>) {
+    override fun insertKey(k: PostId, v: DateTime, it: UpdateBuilder<Int>) {
         it[keyColumn] = k.string
     }
 

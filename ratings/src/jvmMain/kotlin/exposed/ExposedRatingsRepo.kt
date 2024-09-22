@@ -33,7 +33,7 @@ class ExposedRatingsRepo (
         it[ratingsColumn] = v.double
     }
 
-    override fun insertKey(k: PostId, v: Rating, it: InsertStatement<Number>) {
+    override fun insertKey(k: PostId, v: Rating, it: UpdateBuilder<Int>) {
         it[keyColumn] = k.string
     }
 

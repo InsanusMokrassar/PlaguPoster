@@ -11,15 +11,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 
 object CommonPlugin : Plugin {
     private val Log = logger
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(config: JsonObject) {
         single { CoroutineScope(Dispatchers.Default + SupervisorJob()) }
-        val useCache = (params["useCache"] as? JsonPrimitive) ?.booleanOrNull ?: true
+        val useCache = (config["useCache"] as? JsonPrimitive) ?.booleanOrNull ?: true
         useCache(useCache)
     }
 

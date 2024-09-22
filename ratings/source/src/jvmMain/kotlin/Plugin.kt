@@ -10,10 +10,12 @@ import dev.inmo.micro_utils.repos.id
 import dev.inmo.micro_utils.repos.pagination.getAll
 import dev.inmo.micro_utils.repos.set
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.database
 import dev.inmo.plaguposter.common.*
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.panel.PanelButtonBuilder
 import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI
@@ -67,10 +69,8 @@ object Plugin : Plugin {
         val panelButtonText: String = "Ratings"
     )
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        single {
-            get<Json>().decodeFromJsonElement(Config.serializer(), params["ratingsPolls"] ?: error("Unable to load config for rating polls in $params"))
-        }
+    override fun Module.setupDI(params: JsonObject) {
+        registerConfig<Config>("ratingsPolls")
         single<RatingsVariants>(ratingVariantsQualifier) { get<Config>().variants }
 
         single { ExposedPollsToPostsIdsRepo(database) }

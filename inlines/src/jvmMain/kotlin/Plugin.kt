@@ -14,7 +14,7 @@ private val actualPlugin = dev.inmo.plagubot.plugins.inline.queries.Plugin
 object Plugin : Plugin by actualPlugin {
     private val log = TagLogger("InlinePlugin")
 
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(params: JsonObject) {
         single { actualPlugin }
     }
 

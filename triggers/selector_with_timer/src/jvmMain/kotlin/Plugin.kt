@@ -16,6 +16,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.ReadPostsRepo
@@ -62,8 +63,8 @@ object Plugin : Plugin {
         @Transient
         val format: DateFormat = DateFormat(dateTimeFormat)
     }
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        single { get<Json>().decodeFromJsonElement(Config.serializer(), params["timer_trigger"] ?: return@single null) }
+    override fun Module.setupDI(params: JsonObject) {
+        registerConfig<Config>("timer_trigger") { null }
     }
 
     @OptIn(FlowPreview::class)

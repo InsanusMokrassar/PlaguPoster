@@ -40,13 +40,13 @@ class PostPublisher(
             contents.singleOrNull() ?.also {
                 targetChatIds.forEach { targetChatId ->
                     runCatching {
-                        bot.copyMessage(targetChatId, it.chatId, it.messageId)
+                        bot.copyMessage(fromChatId = it.chatId, messageId = it.messageId, toChatId = targetChatId)
                     }.onFailure { _ ->
                         runCatching {
                             bot.forwardMessage(
                                 fromChatId = it.chatId,
-                                toChatId = cachingChatId,
-                                messageId = it.messageId
+                                messageId = it.messageId,
+                                toChatId = cachingChatId
                             )
                         }.onSuccess {
                             bot.copyMessage(targetChatId, it)

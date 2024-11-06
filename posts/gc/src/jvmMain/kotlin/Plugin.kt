@@ -14,6 +14,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.posts.models.NewPost
 import dev.inmo.plaguposter.posts.models.PostContentInfo
@@ -38,7 +39,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 
@@ -49,10 +49,8 @@ object Plugin : Plugin {
         val throttlingMillis: MilliSeconds = 1000,
         val doFullCheck: Boolean = false
     )
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        params["messagesChecker"] ?.let { element ->
-            single { get<Json>().decodeFromJsonElement(Config.serializer(), element) }
-        }
+    override fun Module.setupDI(config: JsonObject) {
+        registerConfig<Config>("messagesChecker") { null }
     }
 
     private val gcLogger = KSLog("GarbageCollector")

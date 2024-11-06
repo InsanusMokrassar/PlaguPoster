@@ -8,11 +8,10 @@ import dev.inmo.plaguposter.ratings.repo.RatingsRepo
 import dev.inmo.plaguposter.triggers.timer.TimersRepo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.module.Module
 
 object Plugin : Plugin {
-    override fun Module.setupDI(database: Database, params: JsonObject) {
+    override fun Module.setupDI(config: JsonObject) {
         singleWithRandomQualifier(createdAtStart = true) {
             val timersRepo = get<TimersRepo>()
             val ratingsRepo = get<RatingsRepo>()

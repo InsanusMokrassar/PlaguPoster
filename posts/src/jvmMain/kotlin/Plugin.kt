@@ -7,6 +7,7 @@ import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.singleWithBinds
 import dev.inmo.micro_utils.repos.deleteById
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.database
 import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plaguposter.common.UnsuccessfulSymbol
 import dev.inmo.plaguposter.posts.exposed.ExposedPostsRepo
@@ -26,7 +27,6 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.types.message.textsources.regular
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 
@@ -37,8 +37,8 @@ object Plugin : Plugin {
         val autoRemoveMessages: Boolean = true,
         val deleteAfterPublishing: Boolean = true
     )
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        val configJson = params["posts"] ?: this@Plugin.let {
+    override fun Module.setupDI(config: JsonObject) {
+        val configJson = config["posts"] ?: this@Plugin.let {
             it.logger.w {
                 "Unable to load posts plugin due to absence of `posts` key in config"
             }

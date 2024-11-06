@@ -15,6 +15,7 @@ import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.ratings.models.Rating
@@ -41,8 +42,8 @@ object Plugin : Plugin {
             val skipPostAge: Seconds? = null
         )
     }
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        single { get<Json>().decodeFromJsonElement(Config.serializer(), params["gc"] ?: return@single null) }
+    override fun Module.setupDI(params: JsonObject) {
+        registerConfig<Config>("gc") { null }
     }
 
     override suspend fun BehaviourContext.setupBotPlugin(koin: Koin) {

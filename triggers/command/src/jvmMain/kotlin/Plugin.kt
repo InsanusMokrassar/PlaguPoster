@@ -7,6 +7,7 @@ import dev.inmo.plaguposter.common.SuccessfulSymbol
 import dev.inmo.plagubot.plugins.inline.queries.models.Format
 import dev.inmo.plagubot.plugins.inline.queries.models.OfferTemplate
 import dev.inmo.plagubot.plugins.inline.queries.repos.InlineTemplatesRepo
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.panel.PanelButtonBuilder
 import dev.inmo.plaguposter.posts.panel.PanelButtonsAPI
@@ -45,10 +46,8 @@ object Plugin : Plugin {
     internal data class Config(
         val panelButtonText: String? = "Publish"
     )
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        params["publish_command"] ?.let { configJson ->
-            single { get<Json>().decodeFromJsonElement(Config.serializer(), configJson) }
-        }
+    override fun Module.setupDI(params: JsonObject) {
+        registerConfig<Config>("publish_command") { null }
     }
 
     override suspend fun BehaviourContextWithFSM<State>.setupBotPlugin(koin: Koin) {

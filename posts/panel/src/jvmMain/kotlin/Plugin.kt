@@ -10,6 +10,7 @@ import dev.inmo.micro_utils.repos.cache.cached
 import dev.inmo.micro_utils.repos.cache.full.cached
 import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.plagubot.Plugin
+import dev.inmo.plagubot.registerConfig
 import dev.inmo.plaguposter.common.ChatConfig
 import dev.inmo.plaguposter.common.UnsuccessfulSymbol
 import dev.inmo.plaguposter.common.useCache
@@ -55,10 +56,8 @@ object Plugin : Plugin {
         val rootButtonText: String = "◀️",
         val refreshButtonText: String? = "\uD83D\uDD04"
     )
-    override fun Module.setupDI(database: Database, params: JsonObject) {
-        params["panel"] ?.let { element ->
-            single { get<Json>().decodeFromJsonElement(Config.serializer(), element) }
-        }
+    override fun Module.setupDI(params: JsonObject) {
+        registerConfig<Config>("panel") { null }
         single {
             val config = getOrNull<Config>() ?: Config()
             val builtInButtons = listOfNotNull(

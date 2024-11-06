@@ -2,6 +2,10 @@
 
 ## 0.8.0
 
+* Dependencies update
+* `Ratings`:
+    * Add autoclearing of ratings without target posts each half hours
+
 ## 0.7.0
 
 * Dependencies update

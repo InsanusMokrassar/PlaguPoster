@@ -11,6 +11,7 @@ kotlin {
             dependencies {
                 api project(":plaguposter.common")
                 api project(":plaguposter.posts")
+                api libs.krontab
             }
         }
     }

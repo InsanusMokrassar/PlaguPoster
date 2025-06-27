@@ -132,7 +132,7 @@ class ExposedPostsRepo(
         }.associateBy { it.id }
         val existsIds = posts.keys.toList()
         transaction(db = database) {
-            val deleted = deleteWhere(null, null) {
+            val deleted = deleteWhere {
                 selectByIds(it, existsIds)
             }
             with(contentRepo) {

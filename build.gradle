@@ -2,8 +2,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
         maven { url "https://plugins.gradle.org/m2/" }
+        mavenLocal()
     }
 
     dependencies {
@@ -32,10 +32,10 @@ if ((project.hasProperty('SONATYPE_USER') || System.getenv('SONATYPE_USER') != n
 
 allprojects {
     repositories {
-        mavenLocal()
         mavenCentral()
         google()
         maven { url "https://nexus.inmo.dev/repository/maven-releases/" }
+        mavenLocal()
     }
 }
 

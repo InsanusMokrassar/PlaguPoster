@@ -2,6 +2,8 @@
 
 ## 0.9.0
 
+* Dependencies update
+
 ## 0.8.0
 
 * Dependencies update

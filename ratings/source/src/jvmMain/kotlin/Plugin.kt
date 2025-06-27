@@ -3,6 +3,7 @@ package dev.inmo.plaguposter.ratings.source
 import com.benasher44.uuid.uuid4
 import dev.inmo.kslog.common.e
 import dev.inmo.kslog.common.logger
+import dev.inmo.micro_utils.coroutines.runCatchingLogging
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.pagination.firstPageWithOneElementPagination
@@ -42,10 +43,11 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
-import dev.inmo.tgbotapi.types.message.textsources.bold
-import dev.inmo.tgbotapi.types.message.textsources.regular
+import dev.inmo.tgbotapi.types.message.textsources.boldTextSource
+import dev.inmo.tgbotapi.types.message.textsources.regularTextSource
 import dev.inmo.tgbotapi.types.polls.InputPollOption
 import dev.inmo.tgbotapi.types.polls.PollOption
+import dev.inmo.tgbotapi.utils.bold
 import dev.inmo.tgbotapi.utils.buildEntities
 import dev.inmo.tgbotapi.utils.extensions.makeSourceString
 import kotlinx.coroutines.delay
@@ -198,17 +200,17 @@ object Plugin : Plugin {
             }
 
             if (attachPoll(postId)) {
-                runCatchingSafely {
+                runCatchingLogging {
                     edit(
                         it,
-                        it.content.textSources + regular(" $SuccessfulSymbol")
+                        it.content.textSources + regularTextSource(" $SuccessfulSymbol")
                     )
                 }
             } else {
-                runCatchingSafely {
+                runCatchingLogging {
                     edit(
                         it,
-                        it.content.textSources + regular(" $UnsuccessfulSymbol")
+                        it.content.textSources + regularTextSource(" $UnsuccessfulSymbol")
                     )
                 }
             }
@@ -233,17 +235,17 @@ object Plugin : Plugin {
 
 
             if (detachPoll(postId)) {
-                runCatchingSafely {
+                runCatchingLogging {
                     edit(
                         it,
-                        it.content.textSources + regular(" $SuccessfulSymbol")
+                        it.content.textSources + regularTextSource(" $SuccessfulSymbol")
                     )
                 }
             } else {
-                runCatchingSafely {
+                runCatchingLogging {
                     edit(
                         it,
-                        it.content.textSources + regular(" $UnsuccessfulSymbol")
+                        it.content.textSources + regularTextSource(" $UnsuccessfulSymbol")
                     )
                 }
             }

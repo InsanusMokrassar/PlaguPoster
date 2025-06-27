@@ -24,7 +24,7 @@ import dev.inmo.tgbotapi.extensions.api.edit.edit
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.types.message.textsources.regular
+import dev.inmo.tgbotapi.types.message.textsources.regularTextSource
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.koin.core.Koin
@@ -90,9 +90,9 @@ object Plugin : Plugin {
             postsRepo.deleteById(postId)
 
             if (postsRepo.contains(postId)) {
-                edit(it, it.content.textSources + regular(UnsuccessfulSymbol))
+                edit(it, it.content.textSources + regularTextSource(UnsuccessfulSymbol))
             } else {
-                edit(it, it.content.textSources + regular(SuccessfulSymbol))
+                edit(it, it.content.textSources + regularTextSource(SuccessfulSymbol))
             }
         }
 

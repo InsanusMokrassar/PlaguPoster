@@ -27,7 +27,7 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
-import dev.inmo.tgbotapi.types.message.textsources.regular
+import dev.inmo.tgbotapi.types.message.textsources.regularTextSource
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -90,7 +90,7 @@ object Plugin : Plugin {
 
             edit(
                 it,
-                it.content.textSources + regular(SuccessfulSymbol)
+                it.content.textSources + regularTextSource(SuccessfulSymbol)
             )
         }
 

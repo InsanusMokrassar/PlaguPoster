@@ -10,6 +10,8 @@ kslog = "1.3.6"
 krontab = "2.6.1"
 plagubot-plugins = "0.24.0"
 
+nmcp="0.2.1"
+
 dokka = "1.9.20"
 
 psql = "42.6.0"
@@ -47,3 +49,5 @@ kotlin-dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", vers
 
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+nmcp-aggregation = { id = "com.gradleup.nmcp.aggregation", version.ref = "nmcp" }

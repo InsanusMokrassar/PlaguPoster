@@ -1,16 +1,16 @@
 [versions]
 
-kotlin = "2.1.20"
-kotlin-serialization = "1.8.1"
+kotlin = "2.2.0"
+kotlin-serialization = "1.9.0"
 
-plagubot = "10.6.0"
-tgbotapi = "26.0.0"
-microutils = "0.25.8"
-kslog = "1.4.2"
+plagubot = "10.7.0"
+tgbotapi = "27.1.1"
+microutils = "0.26.2"
+kslog = "1.5.0"
 krontab = "2.7.2"
-plagubot-plugins = "0.24.4"
+plagubot-plugins = "0.24.5"
 
-nmcp="0.2.1"
+nmcp="1.0.2"
 
 dokka = "2.0.0"
 

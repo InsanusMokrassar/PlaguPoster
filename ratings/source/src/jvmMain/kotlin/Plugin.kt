@@ -128,6 +128,7 @@ object Plugin : Plugin {
                 (variantsTransformer(it.textSources.makeSourceString()) ?.double ?.times(it.votes)) ?: 0.0
             }
             ratingsRepo.set(postId, Rating(newRating))
+            panelApi ?.forceRefresh(postId)
         }
 
         suspend fun attachPoll(postId: PostId): Boolean {

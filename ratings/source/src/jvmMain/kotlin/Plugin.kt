@@ -122,13 +122,22 @@ object Plugin : Plugin {
         val panelApi = koin.getOrNull<PanelButtonsAPI>()
         val chatConfig = koin.get<ChatConfig>()
 
+        val panelApiOnPollUpdatesUpdateTrigger: suspend (PostId) -> Unit = if (config.panelButtonText.contains(currentRatingControlSymbol)) {
+            {
+                panelApi ?.forceRefresh(it)
+            }
+        } else {
+            {
+
+            }
+        }
         onPollUpdates (markerFactory = { it.id }) { poll ->
             val postId = pollsToPostsIdsRepo.get(poll.id) ?: return@onPollUpdates
             val newRating = poll.options.sumOf {
                 (variantsTransformer(it.textSources.makeSourceString()) ?.double ?.times(it.votes)) ?: 0.0
             }
             ratingsRepo.set(postId, Rating(newRating))
-            panelApi ?.forceRefresh(postId)
+            panelApiOnPollUpdatesUpdateTrigger(postId)
         }
 
         suspend fun attachPoll(postId: PostId): Boolean {

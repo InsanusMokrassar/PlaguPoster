@@ -42,8 +42,10 @@
     },
     "autoAttach": true,
     "ratingOfferText": "What do you think about it?",
+    "panelButtonText": "Ratings ${attached_symbol}",
     "ratingEnabledStyle": "success",
-    "ratingDisabledStyle": "danger"
+    "ratingDisabledStyle": "danger",
+    "_note": "For panelButtonText you may use two control symbols: ${attached_symbol} to attach icon about enabled state and ${rating} to enable rating showing in button"
   },
   "selector": {
     "items": [

@@ -33,6 +33,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.dataButton
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.types.MilliSeconds
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
 import dev.inmo.tgbotapi.utils.bold
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.filter
@@ -148,7 +149,7 @@ object Plugin : Plugin {
                     message,
                     text = "Are you sure want to trigger posts garbage collecting?",
                     replyMarkup = flatInlineKeyboard {
-                        dataButton("Sure", yesData)
+                        dataButton("Sure", yesData, style = KeyboardButtonStyle.Primary)
                         dataButton("No", noData)
                     }
                 )

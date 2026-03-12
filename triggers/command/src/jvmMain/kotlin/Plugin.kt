@@ -113,7 +113,7 @@ object Plugin : Plugin {
                     PanelButtonBuilder {
                         CallbackDataInlineKeyboardButton(
                             text,
-                            "publish ${it.id.string}"
+                            "publish ${it.id.string}",
                         )
                     }
                 )

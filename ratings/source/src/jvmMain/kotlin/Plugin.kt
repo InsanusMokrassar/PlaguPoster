@@ -43,6 +43,7 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
 import dev.inmo.tgbotapi.types.message.textsources.boldTextSource
 import dev.inmo.tgbotapi.types.message.textsources.regularTextSource
 import dev.inmo.tgbotapi.types.polls.InputPollOption
@@ -67,7 +68,9 @@ object Plugin : Plugin {
         val variants: RatingsVariants,
         val autoAttach: Boolean,
         val ratingOfferText: String,
-        val panelButtonText: String = "Ratings"
+        val panelButtonText: String = "Ratings",
+        val ratingEnabledStyle: KeyboardButtonStyle? = null,
+        val ratingDisabledStyle: KeyboardButtonStyle? = null
     )
 
     override fun Module.setupDI(params: JsonObject) {
@@ -296,13 +299,19 @@ object Plugin : Plugin {
         panelApi ?.apply {
             add(
                 PanelButtonBuilder {
+                    val enabled = pollsToPostsIdsRepo.keys(it.id, firstPageWithOneElementPagination).results.any()
                     CallbackDataInlineKeyboardButton(
-                        config.panelButtonText + if (pollsToPostsIdsRepo.keys(it.id, firstPageWithOneElementPagination).results.any()) {
+                        config.panelButtonText + if (enabled) {
                             SuccessfulSymbol
                         } else {
                             UnsuccessfulSymbol
                         },
-                        "toggle_ratings ${it.id.string}"
+                        "toggle_ratings ${it.id.string}",
+                        style = if (enabled) {
+                            config.ratingEnabledStyle
+                        } else {
+                            config.ratingDisabledStyle
+                        }
                     )
                 }
             )

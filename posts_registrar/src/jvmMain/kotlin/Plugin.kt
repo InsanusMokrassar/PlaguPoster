@@ -22,6 +22,7 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.sameChat
 import dev.inmo.tgbotapi.extensions.utils.extensions.sameMessage
 import dev.inmo.tgbotapi.extensions.utils.textContentOrNull
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.*
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
 import dev.inmo.tgbotapi.utils.regular
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
@@ -56,7 +57,8 @@ object Plugin : Plugin {
                         flatInlineKeyboard {
                             dataButton(
                                 "Finish",
-                                buttonUuid
+                                buttonUuid,
+                                style = KeyboardButtonStyle.Primary,
                             )
                         }
                     } else {

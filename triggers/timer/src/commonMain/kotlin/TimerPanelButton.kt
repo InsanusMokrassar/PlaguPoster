@@ -6,6 +6,7 @@ import dev.inmo.plaguposter.posts.models.RegisteredPost
 import dev.inmo.plaguposter.posts.panel.PanelButtonBuilder
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.InlineKeyboardButton
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
 
 class TimerPanelButton(
     private val timersRepo: TimersRepo
@@ -18,7 +19,12 @@ class TimerPanelButton(
 
         return CallbackDataInlineKeyboardButton(
             "⏰ ${ if (publishingTime == null) UnsuccessfulSymbol else SuccessfulSymbol }",
-            "$timerSetPrefix ${post.id}"
+            "$timerSetPrefix ${post.id}",
+            style = if (publishingTime == null) {
+                null
+            } else {
+                KeyboardButtonStyle.Success
+            }
         )
     }
 

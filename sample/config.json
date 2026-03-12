@@ -41,7 +41,9 @@
       "Results": 0
     },
     "autoAttach": true,
-    "ratingOfferText": "What do you think about it?"
+    "ratingOfferText": "What do you think about it?",
+    "ratingEnabledStyle": "success",
+    "ratingDisabledStyle": "danger"
   },
   "selector": {
     "items": [

@@ -347,12 +347,19 @@ object Plugin : Plugin {
                             }
                         }
                         .let {
-                            val rating = rating()
-                            if (rating != null) {
-                                it.replace(
-                                    currentRatingControlSymbol,
-                                    rating.double.roundToInt().toString()
-                                )
+                            if (it.contains(currentRatingControlSymbol)) {
+                                val rating = rating()
+                                if (rating != null) {
+                                    it.replace(
+                                        currentRatingControlSymbol,
+                                        rating.double.roundToInt().toString()
+                                    )
+                                } else {
+                                    it.replace(
+                                        currentRatingControlSymbol,
+                                        UnsuccessfulSymbol
+                                    )
+                                }
                             } else {
                                 it
                             }

@@ -6,9 +6,17 @@ import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.ratings.models.Rating
 import dev.inmo.plaguposter.ratings.repo.RatingsRepo
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.greaterEq
+import org.jetbrains.exposed.v1.core.lessEq
+import org.jetbrains.exposed.v1.core.notInList
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.Query
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedRatingsRepo (
     database: Database
@@ -18,8 +26,8 @@ class ExposedRatingsRepo (
 ) {
     override val keyColumn = text("post_id")
     val ratingsColumn = double("rating")
-    override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
-    override val selectByValue: ISqlExpressionBuilder.(Rating) -> Op<Boolean> = { ratingsColumn.eq(it.double) }
+    override val selectById: (PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
+    override val selectByValue: (Rating) -> Op<Boolean> = { ratingsColumn.eq(it.double) }
     override val ResultRow.asKey: PostId
         get() = get(keyColumn).let(::PostId)
     override val ResultRow.asObject: Rating

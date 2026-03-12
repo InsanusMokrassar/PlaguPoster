@@ -25,7 +25,6 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.types.Seconds
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 

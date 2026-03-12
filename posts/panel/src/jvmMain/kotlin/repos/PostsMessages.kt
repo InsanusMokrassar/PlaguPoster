@@ -8,7 +8,7 @@ import dev.inmo.tgbotapi.types.*
 import kotlinx.serialization.builtins.PairSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.v1.jdbc.Database
 
 private val ChatIdToMessageSerializer = PairSerializer(FullChatIdentifierSerializer, MessageId.serializer())
 

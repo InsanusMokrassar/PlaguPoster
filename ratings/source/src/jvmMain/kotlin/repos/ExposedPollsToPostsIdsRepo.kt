@@ -4,16 +4,19 @@ import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.tgbotapi.types.PollId
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.statements.*
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.Database
 
 class ExposedPollsToPostsIdsRepo(
     database: Database
 ) : PollsToPostsIdsRepo, AbstractExposedKeyValueRepo<PollId, PostId>(database, "polls_to_posts") {
     override val keyColumn = text("poll_id")
     val postIdColumn = text("postId")
-    override val selectById: ISqlExpressionBuilder.(PollId) -> Op<Boolean> = { keyColumn.eq(it.string) }
-    override val selectByValue: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { postIdColumn.eq(it.string) }
+    override val selectById: (PollId) -> Op<Boolean> = { keyColumn.eq(it.string) }
+    override val selectByValue: (PostId) -> Op<Boolean> = { postIdColumn.eq(it.string) }
     override val ResultRow.asKey: PollId
         get() = PollId(get(keyColumn))
     override val ResultRow.asObject: PostId

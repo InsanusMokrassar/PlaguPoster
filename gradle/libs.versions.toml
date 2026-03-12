@@ -1,20 +1,22 @@
 [versions]
 
-kotlin = "2.2.0"
-kotlin-serialization = "1.9.0"
+kotlin = "2.3.10"
+kotlin-serialization = "1.10.0"
 
-plagubot = "10.7.0"
-tgbotapi = "27.1.2"
-microutils = "0.26.2"
-kslog = "1.5.0"
-krontab = "2.7.2"
-plagubot-plugins = "0.24.5"
+plagubot = "11.0.0"
+tgbotapi = "32.0.0"
+microutils = "0.29.1"
+kslog = "1.6.0"
+krontab = "2.8.0"
+plagubot-plugins = "0.25.0"
 
-nmcp="1.0.2"
+nmcp = "1.4.4"
 
 dokka = "2.0.0"
 
 psql = "42.6.0"
+
+github-release = "2.5.2"
 
 [libraries]
 
@@ -44,6 +46,7 @@ psql = { module = "org.postgresql:postgresql", version.ref = "psql" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization-plugin = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlin-dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+github-release = { module = "com.github.breadmoirai:github-release", version.ref = "github-release" }
 
 [plugins]
 

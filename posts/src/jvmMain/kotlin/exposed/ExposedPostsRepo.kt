@@ -13,11 +13,19 @@ import dev.inmo.tgbotapi.types.IdChatIdentifier
 import dev.inmo.tgbotapi.types.MessageId
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
-import org.jetbrains.exposed.sql.statements.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.inList
+import org.jetbrains.exposed.v1.core.isNull
+import org.jetbrains.exposed.v1.core.statements.InsertStatement
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.deleteWhere
+import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedPostsRepo(
     override val database: Database
@@ -37,8 +45,8 @@ class ExposedPostsRepo(
 
     override val primaryKey: PrimaryKey = PrimaryKey(idColumn)
 
-    override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
-    override val selectByIds: ISqlExpressionBuilder.(List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
+    override val selectById: (PostId) -> Op<Boolean> = { idColumn.eq(it.string) }
+    override val selectByIds: (List<PostId>) -> Op<Boolean> = { idColumn.inList(it.map { it.string }) }
     override val ResultRow.asId: PostId
         get() = PostId(get(idColumn))
     override val ResultRow.asObject: RegisteredPost
@@ -133,7 +141,7 @@ class ExposedPostsRepo(
         val existsIds = posts.keys.toList()
         transaction(db = database) {
             val deleted = deleteWhere {
-                selectByIds(it, existsIds)
+                selectByIds(existsIds)
             }
             with(contentRepo) {
                 deleteWhere {

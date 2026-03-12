@@ -25,14 +25,14 @@ if (secretFile.exists() || project.hasProperty(githubTokenVariableName) || (gith
     githubRelease {
         token githubReleaseToken
 
-        owner "InsanusMokrassar"
-        repo "PlaguPoster"
+        owner = "InsanusMokrassar"
+        repo = "PlaguPoster"
 
-        tagName "v${project.version}"
-        releaseName "${project.version}"
-        targetCommitish "${project.version}"
+        tagName = "v${project.version}"
+        releaseName = "${project.version}"
+        targetCommitish = "${project.version}"
 
-        body getCurrentVersionChangelog()
+        body = getCurrentVersionChangelog()
     }
 }
 

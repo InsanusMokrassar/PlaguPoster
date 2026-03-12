@@ -1,13 +1,12 @@
 package dev.inmo.plaguposter.posts.panel
 
 import com.benasher44.uuid.uuid4
+import dev.inmo.micro_utils.coroutines.runCatchingLogging
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
+import dev.inmo.micro_utils.coroutines.subscribeLoggingDropExceptions
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
 import dev.inmo.micro_utils.koin.getAllDistinct
 import dev.inmo.micro_utils.repos.*
-import dev.inmo.micro_utils.repos.cache.cache.FullKVCache
-import dev.inmo.micro_utils.repos.cache.cached
-import dev.inmo.micro_utils.repos.cache.full.cached
 import dev.inmo.micro_utils.repos.cache.full.fullyCached
 import dev.inmo.plagubot.Plugin
 import dev.inmo.plagubot.registerConfig
@@ -35,6 +34,7 @@ import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardMarkup
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
 import dev.inmo.tgbotapi.types.message.ParseMode
 import dev.inmo.tgbotapi.utils.bold
 import dev.inmo.tgbotapi.utils.buildEntities
@@ -42,7 +42,6 @@ import dev.inmo.tgbotapi.utils.italic
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 
@@ -73,7 +72,8 @@ object Plugin : Plugin {
                     PanelButtonBuilder {
                         CallbackDataInlineKeyboardButton(
                             text,
-                            "refresh ${it.id.string}"
+                            "refresh ${it.id.string}",
+                            style = KeyboardButtonStyle.Primary
                         )
                     }
                 }
@@ -101,7 +101,7 @@ object Plugin : Plugin {
             basePostsMessages
         }
 
-        postsRepo.newObjectsFlow.subscribeSafelyWithoutExceptions(this) {
+        postsRepo.newObjectsFlow.subscribeLoggingDropExceptions(this) {
             val firstContent = it.content.first()
             val buttons = api.buttonsBuilders.chunked(config.buttonsPerRow).mapNotNull { row ->
                 row.mapNotNull { builder ->
@@ -166,7 +166,7 @@ object Plugin : Plugin {
             edit(
                 query.message,
                 replyMarkup = flatInlineKeyboard {
-                    dataButton("\uD83D\uDDD1", approveData)
+                    dataButton("\uD83D\uDDD1", approveData, style = KeyboardButtonStyle.Danger)
                     api.RootPanelButtonBuilder.buildButton(post) ?.let(::add)
                 }
             )
@@ -188,7 +188,7 @@ object Plugin : Plugin {
             val postId = query.data.removePrefix("refresh ").let(::PostId)
             val (chatId, messageId) = postsMessages.get(postId) ?: return@onMessageDataCallbackQuery
 
-            runCatchingSafely {
+            runCatching {
                 refreshPostMessage(
                     postId,
                     chatId,

@@ -3,6 +3,7 @@ package dev.inmo.plaguposter.ratings.source
 import com.benasher44.uuid.uuid4
 import dev.inmo.kslog.common.e
 import dev.inmo.kslog.common.logger
+import dev.inmo.micro_utils.common.fixed
 import dev.inmo.micro_utils.coroutines.runCatchingLogging
 import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.micro_utils.coroutines.subscribeSafelyWithoutExceptions
@@ -43,6 +44,8 @@ import dev.inmo.tgbotapi.extensions.utils.types.buttons.flatInlineKeyboard
 import dev.inmo.tgbotapi.extensions.utils.types.buttons.inlineKeyboard
 import dev.inmo.tgbotapi.types.ReplyParameters
 import dev.inmo.tgbotapi.types.buttons.InlineKeyboardButtons.CallbackDataInlineKeyboardButton
+import dev.inmo.tgbotapi.types.buttons.KeyboardButtonStyle
+import dev.inmo.tgbotapi.types.keyboardButtonRequestUserLimit
 import dev.inmo.tgbotapi.types.message.textsources.boldTextSource
 import dev.inmo.tgbotapi.types.message.textsources.regularTextSource
 import dev.inmo.tgbotapi.types.polls.InputPollOption
@@ -54,13 +57,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
-import org.jetbrains.exposed.sql.Database
 import org.koin.core.Koin
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
+import kotlin.math.roundToInt
 
 object Plugin : Plugin {
     private val ratingVariantsQualifier = named("ratingsVariants")
+    private const val attachedSymbolControlSymbol = "\${attached_symbol}"
+    private const val currentRatingControlSymbol = "\${rating}"
 
     @Serializable
     internal data class Config(
@@ -68,7 +73,9 @@ object Plugin : Plugin {
         val variants: RatingsVariants,
         val autoAttach: Boolean,
         val ratingOfferText: String,
-        val panelButtonText: String = "Ratings"
+        val panelButtonText: String = "Ratings $attachedSymbolControlSymbol",
+        val ratingEnabledStyle: KeyboardButtonStyle? = null,
+        val ratingDisabledStyle: KeyboardButtonStyle? = null,
     )
 
     override fun Module.setupDI(params: JsonObject) {
@@ -115,12 +122,22 @@ object Plugin : Plugin {
         val panelApi = koin.getOrNull<PanelButtonsAPI>()
         val chatConfig = koin.get<ChatConfig>()
 
+        val panelApiOnPollUpdatesUpdateTrigger: suspend (PostId) -> Unit = if (config.panelButtonText.contains(currentRatingControlSymbol)) {
+            {
+                panelApi ?.forceRefresh(it)
+            }
+        } else {
+            {
+
+            }
+        }
         onPollUpdates (markerFactory = { it.id }) { poll ->
             val postId = pollsToPostsIdsRepo.get(poll.id) ?: return@onPollUpdates
             val newRating = poll.options.sumOf {
                 (variantsTransformer(it.textSources.makeSourceString()) ?.double ?.times(it.votes)) ?: 0.0
             }
             ratingsRepo.set(postId, Rating(newRating))
+            panelApiOnPollUpdatesUpdateTrigger(postId)
         }
 
         suspend fun attachPoll(postId: PostId): Boolean {
@@ -297,13 +314,69 @@ object Plugin : Plugin {
         panelApi ?.apply {
             add(
                 PanelButtonBuilder {
+                    suspend fun isEnabled() = pollsToPostsIdsRepo.keys(it.id, firstPageWithOneElementPagination).results.any()
+                    val enabled = let { _ ->
+                        var enabled: Boolean? = null
+                        suspend {
+                            enabled ?: (isEnabled().also { enabled = it })
+                        }
+                    }
+                    val rating = let { _ ->
+                        var rating: Rating? = null
+                        suspend {
+                            if (isEnabled()) {
+                                rating ?: ratingsRepo.get(it.id) ?.also { rating = it }
+                            } else {
+                                null
+                            }
+                        }
+                    }
+                    val resultText = config.panelButtonText
+                        .let {
+                            if (it.contains(attachedSymbolControlSymbol)) {
+                                it.replace(
+                                    attachedSymbolControlSymbol,
+                                    if (enabled()) {
+                                        SuccessfulSymbol
+                                    } else {
+                                        UnsuccessfulSymbol
+                                    }
+                                )
+                            } else {
+                                it
+                            }
+                        }
+                        .let {
+                            if (it.contains(currentRatingControlSymbol)) {
+                                val rating = rating()
+                                if (rating != null) {
+                                    it.replace(
+                                        currentRatingControlSymbol,
+                                        rating.double.roundToInt().toString()
+                                    )
+                                } else {
+                                    it.replace(
+                                        currentRatingControlSymbol,
+                                        UnsuccessfulSymbol
+                                    )
+                                }
+                            } else {
+                                it
+                            }
+                        }
+                        .take(12) // maximal text appropriate for this button
                     CallbackDataInlineKeyboardButton(
-                        config.panelButtonText + if (pollsToPostsIdsRepo.keys(it.id, firstPageWithOneElementPagination).results.any()) {
-                            SuccessfulSymbol
+                        resultText,
+                        "toggle_ratings ${it.id.string}",
+                        style = if (config.ratingEnabledStyle != null || config.ratingDisabledStyle != null) {
+                            if (enabled()) {
+                                config.ratingEnabledStyle
+                            } else {
+                                config.ratingDisabledStyle
+                            }
                         } else {
-                            UnsuccessfulSymbol
-                        },
-                        "toggle_ratings ${it.id.string}"
+                            null
+                        }
                     )
                 }
             )

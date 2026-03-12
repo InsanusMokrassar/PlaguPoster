@@ -4,10 +4,13 @@ import dev.inmo.micro_utils.repos.exposed.initTable
 import dev.inmo.micro_utils.repos.exposed.keyvalue.AbstractExposedKeyValueRepo
 import dev.inmo.plaguposter.common.ShortMessageInfo
 import dev.inmo.tgbotapi.types.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.isNull
-import org.jetbrains.exposed.sql.statements.*
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.isNull
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.Database
 
 class ExposedPollsToMessagesInfoRepo(
     database: Database
@@ -19,8 +22,8 @@ class ExposedPollsToMessagesInfoRepo(
     private val chatIdColumn = long("chat_id")
     private val threadIdColumn = long("thread_id").nullable().default(null)
     private val messageIdColumn = long("message_id")
-    override val selectById: ISqlExpressionBuilder.(PollId) -> Op<Boolean> = { keyColumn.eq(it.string) }
-    override val selectByValue: ISqlExpressionBuilder.(ShortMessageInfo) -> Op<Boolean> = {
+    override val selectById: (PollId) -> Op<Boolean> = { keyColumn.eq(it.string) }
+    override val selectByValue: (ShortMessageInfo) -> Op<Boolean> = {
         chatIdColumn.eq(it.chatId.chatId.long)
             .and(it.chatId.threadId?.let { threadIdColumn.eq(it.long) } ?: threadIdColumn.isNull()).and(
             messageIdColumn.eq(it.messageId.long)

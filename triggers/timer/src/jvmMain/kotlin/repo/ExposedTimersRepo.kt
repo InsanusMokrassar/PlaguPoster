@@ -11,15 +11,12 @@ import dev.inmo.plaguposter.posts.models.PostId
 import dev.inmo.plaguposter.posts.repo.PostsRepo
 import dev.inmo.plaguposter.triggers.timer.TimersRepo
 import kotlinx.coroutines.CoroutineScope
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.ISqlExpressionBuilder
-import org.jetbrains.exposed.sql.Op
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.statements.InsertStatement
-import org.jetbrains.exposed.sql.statements.UpdateBuilder
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.core.Op
+import org.jetbrains.exposed.v1.core.ResultRow
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.statements.UpdateBuilder
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class ExposedTimersRepo(
     database: Database,
@@ -31,8 +28,8 @@ class ExposedTimersRepo(
 ) {
     override val keyColumn = text("post_id")
     private val dateTimeColumn = long("date_time")
-    override val selectById: ISqlExpressionBuilder.(PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
-    override val selectByValue: ISqlExpressionBuilder.(DateTime) -> Op<Boolean> = { dateTimeColumn.eq(it.unixMillisLong) }
+    override val selectById: (PostId) -> Op<Boolean> = { keyColumn.eq(it.string) }
+    override val selectByValue: (DateTime) -> Op<Boolean> = { dateTimeColumn.eq(it.unixMillisLong) }
     override val ResultRow.asKey: PostId
         get() = PostId(get(keyColumn))
     override val ResultRow.asObject: DateTime

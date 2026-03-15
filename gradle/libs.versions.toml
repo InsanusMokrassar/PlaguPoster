@@ -3,7 +3,7 @@
 kotlin = "2.3.10"
 kotlin-serialization = "1.10.0"
 
-plagubot = "11.0.0"
+plagubot = "11.1.0"
 tgbotapi = "32.0.0"
 microutils = "0.29.1"
 kslog = "1.6.0"

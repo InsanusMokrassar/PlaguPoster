@@ -2,6 +2,8 @@
 
 ## 0.11.1
 
+* Update `PlaguBot` dependency to allow using of `proxy` section in config
+
 ## 0.11.0
 
 ## 0.10.1

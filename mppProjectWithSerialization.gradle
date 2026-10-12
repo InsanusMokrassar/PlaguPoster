@@ -5,10 +5,8 @@ apply from: "$publishGradlePath"
 
 kotlin {
     jvm {
-        compilations.main {
-            kotlinOptions {
-                jvmTarget = "17"
-            }
+        compilerOptions {
+            jvmTarget = "JVM_17"
         }
     }
     js (IR) {

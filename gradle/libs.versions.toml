@@ -1,20 +1,20 @@
 [versions]
 
-kotlin = "2.3.10"
-kotlin-serialization = "1.10.0"
+kotlin = "2.4.21"
+kotlin-serialization = "1.11.0"
 
-plagubot = "11.1.0"
-tgbotapi = "32.0.0"
-microutils = "0.29.1"
-kslog = "1.6.0"
-krontab = "2.8.0"
-plagubot-plugins = "0.25.0"
+plagubot = "14.0.0"
+tgbotapi = "37.1.0"
+microutils = "0.32.0"
+kslog = "2.1.0"
+krontab = "3.1.0"
+plagubot-plugins = "0.29.0"
 
-nmcp = "1.4.4"
+nmcp = "1.6.2"
 
-dokka = "2.0.0"
+dokka = "2.2.0"
 
-psql = "42.6.0"
+psql = "42.7.14"
 
 github-release = "2.5.2"
 

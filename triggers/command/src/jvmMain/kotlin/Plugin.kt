@@ -69,8 +69,10 @@ object Plugin : Plugin {
             val postId = messageInReply ?.let {
                 postsRepo.getIdByChatAndMessage(messageInReply.chat.id, messageInReply.messageId) ?: let { _ ->
                     reply(
-                        it,
-                        "Unable to find any post related to the message in reply"
+                        toChatId = it.chat.id,
+                        toMessageId = it.messageId,
+                        text = "Unable to find any post related to the message in reply",
+                        ephemeralMessageParameters = null
                     )
 
                     return@onCommand

@@ -49,7 +49,7 @@ class PostPublisher(
                                 toChatId = cachingChatId
                             )
                         }.onSuccess {
-                            bot.copyMessage(targetChatId, it)
+                            bot.copyMessage(fromChatId = it.chat.id, messageId = it.messageId, toChatId = targetChatId)
                             haveSentMessages = true
                         }
                     }.onSuccess {

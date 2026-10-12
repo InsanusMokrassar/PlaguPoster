@@ -2,6 +2,23 @@
 
 ## 0.12.0
 
+* `Versions`:
+  * `kotlin`: `2.3.10` -> `2.4.21`
+  * `kotlin-serialization`: `1.10.0` -> `1.11.0`
+  * `psql`: `42.6.0` -> `42.7.14`
+  * `dokka`: `2.0.0` -> `2.2.0`
+  * `nmcp`: `1.4.4` -> `1.6.2`
+  * `plagubot`: `11.1.0` -> `14.0.0`
+  * `tgbotapi`: `32.0.0` -> `37.1.0`
+  * `microutils`: `0.29.1` -> `0.32.0`
+  * `kslog`: `1.6.0` -> `2.1.0`
+  * `krontab`: `2.8.0` -> `3.1.0`
+  * `plagubot-plugins`: `0.25.0` -> `0.29.0`
+  * `Docker JDK`: `19` -> `21.0.12.1`
+  * `Gradle`: `8.13` -> `9.7.0`
+* Adapt forwarded-message copying and replies to updated Telegram message types
+* Migrate compiler options and application main class configuration for Kotlin 2.4 and Gradle 9
+
 ## 0.11.1
 
 * Update `PlaguBot` dependency to allow using of `proxy` section in config

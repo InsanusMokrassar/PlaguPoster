@@ -62,8 +62,10 @@ object Plugin : Plugin {
                 exists != null
             )
             reply(
-                it.message,
-                textSources,
+                toChatId = it.message.chat.id,
+                toMessageId = it.message.messageId,
+                entities = textSources,
+                ephemeralMessageParameters = null,
                 replyMarkup = buttons
             )
 

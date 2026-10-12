@@ -1,5 +1,7 @@
 # PlaguPoster
 
+## 0.12.0
+
 ## 0.11.1
 
 * Update `PlaguBot` dependency to allow using of `proxy` section in config
